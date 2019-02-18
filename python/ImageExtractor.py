@@ -100,7 +100,8 @@ class ImageExtractor:
 
 	# Performs HSV colour threshold on the image based on the upper and
 	# lower threshold values provided and returns the resulting mask.
-	def hsv_colour_threshold(self, frame, lower_value, upper_value):
+	@staticmethod
+	def hsv_colour_threshold(frame, lower_value, upper_value):
 		# Convert RGB frame to HSV for better colour separation
 		hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -110,7 +111,8 @@ class ImageExtractor:
 		return mask
 
 	# Prints the progress of video / image analysis to the console.
-	def show_progressbar(self, iteration, total, fill='█'):
+	@staticmethod
+	def show_progressbar(iteration, total, fill='█'):
 		# The code taken from:
 		# https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
 		percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
@@ -123,7 +125,8 @@ class ImageExtractor:
 
 	########## 01/02/2019
 	# Divides the image into 4 images
-	def divide_image(self, frame):
+	@staticmethod
+	def divide_image(frame):
 		divided_images = list()
 		imcol, imrow, _ = frame.shape
 		colstep = int(imcol/2)
