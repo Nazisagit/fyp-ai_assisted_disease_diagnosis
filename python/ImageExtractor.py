@@ -40,7 +40,8 @@ class ImageExtractor:
 						cv2.imwrite(final_output, img)
 					#######################################################################################
 
-	def crop_frame(self, frame):
+	@staticmethod
+	def crop_frame(frame):
 		########## 03/02/2019
 		## lower_black = np.array([0, 0, 16])
 		## upper_black = np.array([165, 120, 23])

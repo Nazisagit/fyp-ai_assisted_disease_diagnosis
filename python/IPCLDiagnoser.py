@@ -62,7 +62,7 @@ class IPCLDiagnoser:
 			modes = self.calculate_modes(feature_vectors)
 
 			self.add_to_stats(means, medians, stds, modes)
-			# self.print_to_console(means, medians, stds, modes, table_height)
+			self.print_to_console(means, medians, stds, modes, table_height)
 			self.save_statistical_data(means, medians, stds, modes, table_height, new_file)
 
 	@staticmethod
@@ -135,35 +135,35 @@ class IPCLDiagnoser:
 	@staticmethod
 	def print_to_console(means, medians, stds, modes, table_height):
 		print('----------------------------------------------------------------------------')
-		print('Mean Rotation', means[0])
-		print('Mean Area', means[1])
-		print('Mean Length', means[2])
-		print('Mean Width', means[3])
-		print('Mean Height', means[4])
-		print('Mean Calibre', means[5])
+		print('Mean Rotation: ', means[0])
+		print('Mean Area: ', means[1])
+		print('Mean Length: ', means[2])
+		print('Mean Width: ', means[3])
+		print('Mean Height: ', means[4])
+		print('Mean Calibre: ', means[5])
 		print('----------------------------------------------------------------------------')
-		print('Median Rotation', medians[0])
-		print('Median Area', medians[1])
-		print('Median Length', medians[2])
-		print('Median Width', medians[3])
-		print('Median Height', medians[4])
-		print('Median Calibre', medians[5])
+		print('Median Rotation: ', medians[0])
+		print('Median Area: ', medians[1])
+		print('Median Length: ', medians[2])
+		print('Median Width: ', medians[3])
+		print('Median Height: ', medians[4])
+		print('Median Calibre: ', medians[5])
 		print('----------------------------------------------------------------------------')
-		print('StD Rotation', stds[0])
-		print('StD Area', stds[1])
-		print('StD Length', stds[2])
-		print('StD Width', stds[3])
-		print('StD Height', stds[4])
-		print('StD Calibre', stds[5])
+		print('StD Rotation: ', stds[0])
+		print('StD Area: ', stds[1])
+		print('StD Length: ', stds[2])
+		print('StD Width: ', stds[3])
+		print('StD Height: ', stds[4])
+		print('StD Calibre: ', stds[5])
 		print('----------------------------------------------------------------------------')
-		print('Mode Rotation', modes[0])
-		print('Mode Area', modes[1])
-		print('Mode Length', modes[2])
-		print('Mode Width', modes[3])
-		print('Mode Height', modes[4])
-		print('Mode Calibre', modes[5])
+		print('Mode Rotation: ', modes[0])
+		print('Mode Area: ', modes[1])
+		print('Mode Length: ', modes[2])
+		print('Mode Width: ', modes[3])
+		print('Mode Height: ', modes[4])
+		print('Mode Calibre: ', modes[5])
 		print('----------------------------------------------------------------------------')
-		print('Elements:', table_height)
+		print('Elements: ', table_height)
 		print()
 
 	@staticmethod
@@ -197,7 +197,34 @@ class IPCLDiagnoser:
 	def save_statistical_data(means, medians, stds, modes, table_height, new_file):
 		for row in range(0, table_height):
 			new_file.write('----------------------------------------------------------------------------')
-			new_file.write()
+			new_file.write('Mean Rotation: ', means[0])
+			new_file.write('Mean Area: ', means[1])
+			new_file.write('Mean Length: ', means[2])
+			new_file.write('Mean Width: ', means[3])
+			new_file.write('Mean Height: ', means[4])
+			new_file.write('Mean Calibre: ', means[5])
+			new_file.write('----------------------------------------------------------------------------')
+			new_file.write('Median Rotation: ', medians[0])
+			new_file.write('Median Area: ', medians[1])
+			new_file.write('Median Length: ', medians[2])
+			new_file.write('Median Width: ', medians[3])
+			new_file.write('Median Height: ', medians[4])
+			new_file.write('Median Calibre: ', medians[5])
+			new_file.write('----------------------------------------------------------------------------')
+			new_file.write('StD Rotation: ', stds[0])
+			new_file.write('StD Area: ', stds[1])
+			new_file.write('StD Length: ', stds[2])
+			new_file.write('StD Width: ', stds[3])
+			new_file.write('StD Height: ', stds[4])
+			new_file.write('StD Calibre: ', stds[5])
+			new_file.write('----------------------------------------------------------------------------')
+			new_file.write('Mode Rotation: ', modes[0])
+			new_file.write('Mode Area: ', modes[1])
+			new_file.write('Mode Length: ', modes[2])
+			new_file.write('Mode Width: ', modes[3])
+			new_file.write('Mode Height: ', modes[4])
+			new_file.write('Mode Calibre: ', modes[5])
+			new_file.write('----------------------------------------------------------------------------')
 			new_file.write('\n')
 		new_file.close()
 
@@ -266,7 +293,7 @@ class IPCLDiagnoser:
 			print('IPCL Type 3 identified. Probability: ', diagnoses['Type 3'] / normalisation_constant * 100)
 		elif max(diagnoses.values()) == diagnoses['Type 4']:
 			print('IPCL Type 4 identified. Probability: ', diagnoses['Type 4'] / normalisation_constant * 100)
-		else:
+		elif max(diagnoses.values()) == diagnoses['Type 5']:
 			print('IPCL Type 5 identified. Probability: ', diagnoses['Type 5'] / normalisation_constant * 100)
 
 	def diagnose_type_1(self, feature_measurements, diagnoses):
@@ -338,6 +365,10 @@ class IPCLDiagnoser:
 		                                                  feature_measurements[4][0][4], feature_measurements[4][1][4])
 		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Calibre'],
 		                                                  feature_measurements[5][0][4], feature_measurements[5][1][4])
+
+	# TODO
+	# 1. Explore idea of recalculating probability of diagnosing next IPCL type if the first type and next type
+	#    fall within a threshold
 
 
 
