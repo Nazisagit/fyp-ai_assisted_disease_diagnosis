@@ -27,11 +27,11 @@ class FeatureDetector:
         self.output_folder = output_folder
         # Define a table that will store extracted features, with structure:
         # [['(X, Y) Coordinate', 'Width', 'Height', 'Rotation', 'Area', 'Colour (R,G,B)', 'Length']]
-        self.featureTable = []
+        self.feature_table = list()
         ########## 12/02/09
         self.feature_tables = list()
         # Define a list that contains number of IPCLs per each frame
-        self.numberIPCLs = []
+        self.number_ipcls = list()
 
     # Main functions which starts feature detection
     def run(self):
@@ -266,26 +266,26 @@ class FeatureDetector:
         maskInverse = maskInverse[topX:bottomX + 1, topY:bottomY + 1]
 
         # To illustrate the results uncomment the lines below
-        fig = plt.figure()
-        plt.subplot(231)
-        plt.imshow(frame)
-        plt.title('Original Frame')
-        plt.subplot(232)
-        plt.imshow(cornersBinary)
-        plt.title('Mask Triangles In Each Corner')
-        plt.subplot(233)
-        plt.imshow(glareBinary)
-        plt.title('Mask Glare')
-        plt.subplot(234)
-        plt.imshow(subtractMask)
-        plt.title('Subtract Mask')
-        plt.subplot(235)
-        plt.imshow(opening)
-        plt.title('Subtract Constraints & Perform Morphology')
-        plt.subplot(236)
-        plt.imshow(img)
-        plt.title('ROI')
-        plt.suptitle('Step 2. Extraction of ROI.', fontsize=16)
+        # fig = plt.figure()
+        # plt.subplot(231)
+        # plt.imshow(frame)
+        # plt.title('Original Frame')
+        # plt.subplot(232)
+        # plt.imshow(cornersBinary)
+        # plt.title('Mask Triangles In Each Corner')
+        # plt.subplot(233)
+        # plt.imshow(glareBinary)
+        # plt.title('Mask Glare')
+        # plt.subplot(234)
+        # plt.imshow(subtractMask)
+        # plt.title('Subtract Mask')
+        # plt.subplot(235)
+        # plt.imshow(opening)
+        # plt.title('Subtract Constraints & Perform Morphology')
+        # plt.subplot(236)
+        # plt.imshow(img)
+        # plt.title('ROI')
+        # plt.suptitle('Step 2. Extraction of ROI.', fontsize=16)
         # If multiple matplotlib windows are opened at the same
         # time uncomment the block=False line
         plt.show()#(block=False)
@@ -350,9 +350,10 @@ class FeatureDetector:
                     # Create new table row entry
                     # [['(X, Y) Coordinate', 'Width', 'Height', 'Rotation', 'Area', 'Colour (R,G,B)', 'Length']]
                     # row = [rect[0], rect[1][0], rect[1][1], rect[2], area, meanColour, length]
-                    row = [rect[0], rect[1][0], rect[1][1], rect[2], area, length]
+                    # ['Rotation', 'Area', 'Length', 'Width', 'Height']
+                    row = [rect[2], area,  length, rect[1][0], rect[1][1]]
                     # Add that new row to the feature table
-                    self.featureTable.append(row)
+                    self.feature_table.append(row)
 
                     # Get the bounding box and draw it on the roi copy
                     box = cv2.boxPoints(rect)
@@ -362,11 +363,11 @@ class FeatureDetector:
             ########## 12/02/09
             # Add tables to the set and then empty the set to separate the data between frames
             # This way we can separate the data for each image and analyse each image data separately
-            self.feature_tables.append(self.featureTable)
-            self.featureTable = []
+            self.feature_tables.append(self.feature_table)
+            self.feature_table = []
 
             # Record the number of IPCLs per current frame in the state (numberIPCLs)
-            self.numberIPCLs.append(len(contours))
+            self.number_ipcls.append(len(contours))
 
             # Print current state of the feature table to console (uncomment if need)
             # self.print_feature_table()
@@ -377,18 +378,18 @@ class FeatureDetector:
             cv2.imwrite(self.output_folder + '_final_output_' + name, output)
 
             # To illustrate the results uncomment the lines below
-            fig = plt.figure()
-            plt.subplot(131)
-            plt.imshow(frame)
-            plt.title('Original')
-            plt.subplot(132)
-            plt.imshow(roi)
-            plt.title('ROI')
-            plt.subplot(133)
-            plt.imshow(output)
-            plt.title('Extracted Features')
-            plt.suptitle('Step 4. Extracting Features From Blobs.', fontsize=16)
-            plt.show()
+            # fig = plt.figure()
+            # plt.subplot(131)
+            # plt.imshow(frame)
+            # plt.title('Original')
+            # plt.subplot(132)
+            # plt.imshow(roi)
+            # plt.title('ROI')
+            # plt.subplot(133)
+            # plt.imshow(output)
+            # plt.title('Extracted Features')
+            # plt.suptitle('Step 4. Extracting Features From Blobs.', fontsize=16)
+            # plt.show()
 
     # Checks if detected IPCL is actually the glare, i.e. if some
     # small glare region was not excluded by glare detection software.
@@ -454,31 +455,32 @@ class FeatureDetector:
     # Prints the current state of the feature table
     def print_feature_table(self):
         # Create and print title
-        title = '(X,Y) Coordinate |  Width  |  Height  | Orientation |  Area  | Length |'
+        title = '  Rotation  |  Area  |  Length  |  Width  |  Height  |'
         # For each row of the table
         for table in self.feature_tables:
-            print('\n' + '---------------------------------------------------------------------------------------------')
+            print('\n---------------------------------------------------------------------------------------------')
             print(title)
             print('---------------------------------------------------------------------------------------------')
             for row in table:
                 # Get all the columns and format them
-                xCoor = '{:.5}'.format(row[0][0])
-                yCoor = '{:.5}'.format(row[0][1])
-                xyCoor = '{:^16}'.format(' (' + xCoor + ',' + yCoor + ')')
-                width = '{:^7.4}'.format(row[1])
-                height = '{:^8.4}'.format(row[2])
-                orientation = '{:^11.4}'.format(row[3])
-                area = '{:^6.4}'.format(row[4])
-                length = '{:^8.4}'.format(row[5])
+                # xCoor = '{:.5}'.format(row[0][0])
+                # yCoor = '{:.5}'.format(row[0][1])
+                # xyCoor = '{:^16}'.format(' (' + xCoor + ',' + yCoor + ')')
+                rotation = '{:^11.4}'.format(row[0])
+                area = '{:^6.4}'.format(row[1])
+                length = '{:^8.4}'.format(row[2])
+                width = '{:^7.4}'.format(row[3])
+                height = '{:^8.4}'.format(row[4])
                 # Print row
-                print(xyCoor + ' | ' + width + ' | ' + height + ' | ' + orientation + ' | ' + area + ' | ' + length + ' |')
+                # print(xyCoor + ' | ' + width + ' | ' + height + ' | ' + rotation + ' | ' + area + ' | ' + length + ' |')
+                print(rotation + '  |  ' + area + '  |  ' + length + '  |  ' + width + '  |  ' + height + '  |')
             print('---------------------------------------------------------------------------------------------')
             # print('{:^76}'.format('TOTAL: ' + str(len(self.featureTable))))
-            print('--------------------------------------------------------------------------------------------- \n')
+            print('---------------------------------------------------------------------------------------------\n')
 
     # Getter for feature table
     def get_feature_table(self):
-        return self.featureTable
+        return self.feature_table
 
     ########## 14/02/2019
     def get_feature_tables(self):
@@ -487,7 +489,7 @@ class FeatureDetector:
     # Getter for list that contains number of
     # IPCLs per each examined frame
     def get_number_ipcls(self):
-        return self.numberIPCLs
+        return self.number_ipcls
 
     # Prints the progress bar of video analysis to the console.
     def show_progressbar(self, iteration, total, fill='█'):
@@ -504,22 +506,22 @@ class FeatureDetector:
     ########## 12/02/2019
     def save_feature_table(self):
         new_file = open(self.output_folder + 'feature_table.txt', 'w+')
-        title = 'Area  | Length |\n'
+        title = '  Rotation  |  Area  |  Length  |  Width  |  Height  |\n'
         for table in self.feature_tables:
             new_file.write('-------------------------------------------------------------------------\n')
             new_file.write(title)
             new_file.write('-------------------------------------------------------------------------\n')
             for row in table:
                 # Get all the columns and format them
-                xCoor = '{:.5}'.format(row[0][0])
-                yCoor = '{:.5}'.format(row[0][1])
-                xyCoor = '{:^16}'.format(' (' + xCoor + ',' + yCoor + ')')
-                width = '{:^7.4}'.format(row[1])
-                height = '{:^8.4}'.format(row[2])
-                orientation = '{:^11.4}'.format(row[3])
-                area = '{:^6.4}'.format(row[4])
-                length = '{:^8.4}'.format(row[5])
-                new_file.write(xyCoor + ' | ' + width + ' | ' + height + ' | ' + orientation + ' | ' + area + ' | ' + length + ' |\n')
+                # xCoor = '{:.5}'.format(row[0][0])
+                # yCoor = '{:.5}'.format(row[0][1])
+                # xyCoor = '{:^16}'.format(' (' + xCoor + ',' + yCoor + ')')
+                rotation = '{:^11.4}'.format(row[0])
+                area = '{:^6.4}'.format(row[1])
+                width = '{:^7.4}'.format(row[2])
+                height = '{:^8.4}'.format(row[3])
+                length = '{:^8.4}'.format(row[4])
+                new_file.write(rotation + ' | ' + area + ' | ' + length + ' | ' + width + ' | ' + height + '  |\n')
             new_file.write('-------------------------------------------------------------------------\n')
             new_file.write('\n')
         new_file.close()

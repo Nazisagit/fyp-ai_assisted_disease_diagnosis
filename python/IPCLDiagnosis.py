@@ -7,8 +7,13 @@ import numpy as np
 import math
 from collections import Counter
 
+# TODO
+# 1. Explore idea of recalculating probability of diagnosing next IPCL type if the first type and next type
+#    fall within a threshold
+# 2.
 
-class IPCLDiagnoser:
+
+class IPCLDiagnosis:
 
 	def __init__(self, feature_tables, statistical_diagnoses_output):
 		self.feature_tables = feature_tables
@@ -19,51 +24,59 @@ class IPCLDiagnoser:
 
 	def analyse_feature_tables(self):
 		# Define vectors necessary for calculation
-		width_vector = list()
-		height_vector = list()
 		rotation_vector = list()
 		area_vector = list()
 		length_vector = list()
+		width_vector = list()
+		height_vector = list()
 		feature_vectors = list()
 
-		new_file = open(self.statistical_diagnoses_output + 'diagnostic_data.txt', 'a+')
+		# Uncomment to save statistical data
+		# new_file = open(self.statistical_diagnoses_output + 'statistical_data.txt', 'w+')
 		for table in self.feature_tables:
 			table_height = len(table)
 			# For Rotation, Area, and Length
-			for feature in [1, 2, 3, 4, 5]:
+			for feature in [0, 1, 2, 3, 4]:
 				# For all entries in the table
 				for row in range(0, table_height):
 					# Calculate Total Rotation
-					if feature == 1:
-						width_vector.append(table[row][feature])
-					elif feature == 2:
-						height_vector.append(table[row][feature])
-					elif feature == 3:
+					if feature == 0:
 						rotation_vector.append(table[row][feature])
-					# Calculate Total Area
-					elif feature == 4:
+					elif feature == 1:
 						area_vector.append(table[row][feature])
-					# Calculate Total Length
-					elif feature == 5:
+					elif feature == 2:
 						length_vector.append(table[row][feature])
-
+					# Calculate Total Area
+					elif feature == 3:
+						width_vector.append(table[row][feature])
+					# Calculate Total Length
+					elif feature == 4:
+						height_vector.append(table[row][feature])
 			calibre_vector = self.calculate_calibres(area_vector, length_vector)
-
-			feature_vectors.append(rotation_vector)
-			feature_vectors.append(area_vector)
-			feature_vectors.append(length_vector)
-			feature_vectors.append(width_vector)
-			feature_vectors.append(height_vector)
-			feature_vectors.append(calibre_vector)
-
+			self.append_feature_vectors(feature_vectors, rotation_vector, area_vector, length_vector,
+			                            width_vector, height_vector, calibre_vector)
 			means = self.calculate_means(feature_vectors)
 			medians = self.calculate_medians(feature_vectors)
 			stds = self.calculate_stds(feature_vectors)
 			modes = self.calculate_modes(feature_vectors)
-
 			self.add_to_stats(means, medians, stds, modes)
-			self.print_to_console(means, medians, stds, modes, table_height)
-			self.save_statistical_data(means, medians, stds, modes, table_height, new_file)
+			# Uncomment to print each table
+			# self.print_to_console(means, medians, stds, modes, table_height)
+
+			# Uncomment to save statistical data
+			# self.save_statistical_data(means, medians, stds, modes, table_height, new_file)
+
+		# Uncomment to save statistical data
+		# new_file.close()
+
+	@staticmethod
+	def append_feature_vectors(features, rotation, area, length, width, height, calibre):
+		features.append(rotation)
+		features.append(area)
+		features.append(length)
+		features.append(width)
+		features.append(height)
+		features.append(calibre)
 
 	@staticmethod
 	def calculate_means(vectors):
@@ -91,6 +104,14 @@ class IPCLDiagnoser:
 		for vector in vectors:
 			modes.append(self.get_mode(vector))
 		return modes
+
+	@staticmethod
+	def calculate_calibres(area_vector, length_vector):
+		calibre_vector = list()
+		for area in area_vector:
+			for length in length_vector:
+				calibre_vector.append(area/length)
+		return calibre_vector
 
 	@staticmethod
 	def get_mode(vector):
@@ -133,7 +154,7 @@ class IPCLDiagnoser:
 		self.statistics['Mode Calibre'] = modes[5]
 
 	@staticmethod
-	def print_to_console(means, medians, stds, modes, table_height):
+	def print_statistical_data(means, medians, stds, modes, table_height):
 		print('----------------------------------------------------------------------------')
 		print('Mean Rotation: ', means[0])
 		print('Mean Area: ', means[1])
@@ -195,46 +216,38 @@ class IPCLDiagnoser:
 
 	@staticmethod
 	def save_statistical_data(means, medians, stds, modes, table_height, new_file):
-		for row in range(0, table_height):
-			new_file.write('----------------------------------------------------------------------------')
-			new_file.write('Mean Rotation: ', means[0])
-			new_file.write('Mean Area: ', means[1])
-			new_file.write('Mean Length: ', means[2])
-			new_file.write('Mean Width: ', means[3])
-			new_file.write('Mean Height: ', means[4])
-			new_file.write('Mean Calibre: ', means[5])
-			new_file.write('----------------------------------------------------------------------------')
-			new_file.write('Median Rotation: ', medians[0])
-			new_file.write('Median Area: ', medians[1])
-			new_file.write('Median Length: ', medians[2])
-			new_file.write('Median Width: ', medians[3])
-			new_file.write('Median Height: ', medians[4])
-			new_file.write('Median Calibre: ', medians[5])
-			new_file.write('----------------------------------------------------------------------------')
-			new_file.write('StD Rotation: ', stds[0])
-			new_file.write('StD Area: ', stds[1])
-			new_file.write('StD Length: ', stds[2])
-			new_file.write('StD Width: ', stds[3])
-			new_file.write('StD Height: ', stds[4])
-			new_file.write('StD Calibre: ', stds[5])
-			new_file.write('----------------------------------------------------------------------------')
-			new_file.write('Mode Rotation: ', modes[0])
-			new_file.write('Mode Area: ', modes[1])
-			new_file.write('Mode Length: ', modes[2])
-			new_file.write('Mode Width: ', modes[3])
-			new_file.write('Mode Height: ', modes[4])
-			new_file.write('Mode Calibre: ', modes[5])
-			new_file.write('----------------------------------------------------------------------------')
-			new_file.write('\n')
-		new_file.close()
-
-	@staticmethod
-	def calculate_calibres(area_vector, length_vector):
-		calibre_vector = list()
-		for row in range(len(area_vector)):
-			calibre = area_vector[row]/length_vector[row]
-			calibre_vector.append(calibre)
-		return calibre_vector
+		new_file.write('\n')
+		new_file.write('----------------------------------------------------------------------------\n')
+		new_file.write('Mean Rotation: ' + str(means[0]) + '\n')
+		new_file.write('Mean Area: ' + str(means[1]) + '\n')
+		new_file.write('Mean Length: ' + str(means[2]) + '\n')
+		new_file.write('Mean Width: ' + str(means[3]) + '\n')
+		new_file.write('Mean Height: ' + str(means[4]) + '\n')
+		new_file.write('Mean Calibre: ' + str(means[5]) + '\n')
+		new_file.write('----------------------------------------------------------------------------\n')
+		new_file.write('Median Rotation: ' + str(medians[0]) + '\n')
+		new_file.write('Median Area: ' + str(medians[1]) + '\n')
+		new_file.write('Median Length: ' + str(medians[2]) + '\n')
+		new_file.write('Median Width: ' + str(medians[3]) + '\n')
+		new_file.write('Median Height: ' + str(medians[4]) + '\n')
+		new_file.write('Median Calibre: ' + str(medians[5]) + '\n')
+		new_file.write('----------------------------------------------------------------------------\n')
+		new_file.write('StD Rotation: ' + str(stds[0]) + '\n')
+		new_file.write('StD Area: ' + str(stds[1]) + '\n')
+		new_file.write('StD Length: ' + str(stds[2]) + '\n')
+		new_file.write('StD Width: ' + str(stds[3]) + '\n')
+		new_file.write('StD Height: ' + str(stds[4]) + '\n')
+		new_file.write('StD Calibre: ' + str(stds[5]) + '\n')
+		new_file.write('----------------------------------------------------------------------------\n')
+		new_file.write('Mode Rotation: ' + str(modes[0]) + '\n')
+		new_file.write('Mode Area: ' + str(modes[1]) + '\n')
+		new_file.write('Mode Length: ' + str(modes[2]) + '\n')
+		new_file.write('Mode Width: ' + str(modes[3]) + '\n')
+		new_file.write('Mode Height: ' + str(modes[4]) + '\n')
+		new_file.write('Mode Calibre: ' + str(modes[5]) + '\n')
+		new_file.write('----------------------------------------------------------------------------\n')
+		new_file.write('Elements: ' + str(table_height))
+		new_file.write('\n')
 
 	def diagnose_by_type(self):
 		# [Type 1, Type 2, Type 3, Type 4, Type 5]
@@ -285,16 +298,7 @@ class IPCLDiagnoser:
 		normalisation_constant = diagnoses['Type 1'] + diagnoses['Type 2']\
 		                         + diagnoses['Type 3'] + diagnoses['Type 4'] + diagnoses['Type 5']
 
-		if max(diagnoses.values()) == diagnoses['Type 1']:
-			print('IPCL Type 1 identified. Probability: ', diagnoses['Type 1'] / normalisation_constant * 100)
-		elif max(diagnoses.values()) == diagnoses['Type 2']:
-			print('IPCL Type 2 identified. Probability: ', diagnoses['Type 2'] / normalisation_constant * 100)
-		elif max(diagnoses.values()) == diagnoses['Type 3']:
-			print('IPCL Type 3 identified. Probability: ', diagnoses['Type 3'] / normalisation_constant * 100)
-		elif max(diagnoses.values()) == diagnoses['Type 4']:
-			print('IPCL Type 4 identified. Probability: ', diagnoses['Type 4'] / normalisation_constant * 100)
-		elif max(diagnoses.values()) == diagnoses['Type 5']:
-			print('IPCL Type 5 identified. Probability: ', diagnoses['Type 5'] / normalisation_constant * 100)
+		self.print_results(diagnoses, normalisation_constant)
 
 	def diagnose_type_1(self, feature_measurements, diagnoses):
 		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Rotation'],
@@ -366,22 +370,15 @@ class IPCLDiagnoser:
 		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Calibre'],
 		                                                  feature_measurements[5][0][4], feature_measurements[5][1][4])
 
-	# TODO
-	# 1. Explore idea of recalculating probability of diagnosing next IPCL type if the first type and next type
-	#    fall within a threshold
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	@staticmethod
+	def print_results(diagnoses, normalisation_constant):
+		if max(diagnoses.values()) == diagnoses['Type 1']:
+			print('IPCL Type 1 identified. Probability: ', diagnoses['Type 1'] / normalisation_constant * 100)
+		elif max(diagnoses.values()) == diagnoses['Type 2']:
+			print('IPCL Type 2 identified. Probability: ', diagnoses['Type 2'] / normalisation_constant * 100)
+		elif max(diagnoses.values()) == diagnoses['Type 3']:
+			print('IPCL Type 3 identified. Probability: ', diagnoses['Type 3'] / normalisation_constant * 100)
+		elif max(diagnoses.values()) == diagnoses['Type 4']:
+			print('IPCL Type 4 identified. Probability: ', diagnoses['Type 4'] / normalisation_constant * 100)
+		elif max(diagnoses.values()) == diagnoses['Type 5']:
+			print('IPCL Type 5 identified. Probability: ', diagnoses['Type 5'] / normalisation_constant * 100)

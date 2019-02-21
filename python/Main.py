@@ -5,11 +5,13 @@
 
 
 # Import necessary classes:
-from python.IPCLDiagnoser import IPCLDiagnoser
+from python.IPCLDiagnosis import IPCLDiagnosis
 from python.ImageExtractor import ImageExtractor
 from python.FeatureDetector import FeatureDetector
 import os
 
+# TODO
+# Diagnosis is not efficient enough and takes too long
 
 # Application main method
 def main():
@@ -17,8 +19,8 @@ def main():
 
     patient_number = '0014057701d'
     patient_date = '2017-09-01'
-    original_images = './Student Data/' + patient_number + '/' + patient_date + '/'
-    extracted_images = './extracted_images/' + patient_number + '/' + patient_date + '/'
+    original_images = '../Student Data/' + patient_number + '/' + patient_date + '/'
+    extracted_images = '../extracted_images/' + patient_number + '/' + patient_date + '/'
 
     if not os.path.exists(extracted_images):
         os.makedirs(extracted_images)
@@ -26,21 +28,21 @@ def main():
     image_extractor = ImageExtractor(original_images, extracted_images)
     image_extractor.extract()
 
-    detected_features = './detected_features/' + patient_number + '/' + patient_date + '/'
+    detected_features = '../detected_features/' + patient_number + '/' + patient_date + '/'
     if not os.path.exists(detected_features):
         os.makedirs(detected_features)
     # Instantiate Feature Detector class
-    featureDetector = FeatureDetector(extracted_images, detected_features)
+    feature_detector = FeatureDetector(extracted_images, detected_features)
     # Step 2: Perform Feature Detection
-    featureDetector.run()
+    feature_detector.run()
 
-    featureDetector.save_feature_table()
+    feature_detector.save_feature_table()
 
-    feature_tables = featureDetector.get_feature_tables()
+    feature_tables = feature_detector.get_feature_tables()
 
-    ipcl_diagnoser = IPCLDiagnoser(feature_tables, detected_features)
-
-    ipcl_diagnoser.analyse_feature_tables()
+    ipcl_diagnosis = IPCLDiagnosis(feature_tables, detected_features)
+    ipcl_diagnosis.analyse_feature_tables()
+    ipcl_diagnosis.diagnose_by_type()
 
 
     # Instantiate Disease Diagnoser
