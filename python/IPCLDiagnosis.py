@@ -125,6 +125,12 @@ class IPCLDiagnosis:
 	def add_to_stats(self, means, medians, stds, modes):
 		self.statistics.clear()
 		# Record the results in the dictionary in the state
+		self.add_to_means(means)
+		self.add_to_medians(medians)
+		self.add_to_stds(stds)
+		self.add_to_modes(modes)
+
+	def add_to_means(self, means):
 		self.statistics['Mean Rotation'] = means[0]
 		self.statistics['Mean Area'] = means[1]
 		self.statistics['Mean Length'] = means[2]
@@ -132,6 +138,7 @@ class IPCLDiagnosis:
 		self.statistics['Mean Height'] = means[4]
 		self.statistics['Mean Calibre'] = means[5]
 
+	def add_to_medians(self, medians):
 		self.statistics['Median Rotation'] = medians[0]
 		self.statistics['Median Area'] = medians[1]
 		self.statistics['Median Length'] = medians[2]
@@ -139,6 +146,7 @@ class IPCLDiagnosis:
 		self.statistics['Median Height'] = medians[4]
 		self.statistics['Median Calibre'] = medians[5]
 
+	def add_to_stds(self, stds):
 		self.statistics['StD Rotation'] = stds[0]
 		self.statistics['StD Area'] = stds[1]
 		self.statistics['StD Length'] = stds[2]
@@ -146,6 +154,7 @@ class IPCLDiagnosis:
 		self.statistics['StD Height'] = stds[4]
 		self.statistics['StD Calibre'] = stds[5]
 
+	def add_to_modes(self, modes):
 		self.statistics['Mode Rotation'] = modes[0]
 		self.statistics['Mode Area'] = modes[1]
 		self.statistics['Mode Length'] = modes[2]
@@ -153,39 +162,54 @@ class IPCLDiagnosis:
 		self.statistics['Mode Height'] = modes[4]
 		self.statistics['Mode Calibre'] = modes[5]
 
-	@staticmethod
-	def print_statistical_data(means, medians, stds, modes, table_height):
+	def print_statistical_data(self, means, medians, stds, modes, table_height):
 		print('----------------------------------------------------------------------------')
+		self.print_means(means)
+		print('----------------------------------------------------------------------------')
+		self.print_medians(medians)
+		print('----------------------------------------------------------------------------')
+		self.print_stds(stds)
+		print('----------------------------------------------------------------------------')
+		self.print_modes(modes)
+		print('----------------------------------------------------------------------------')
+		print('Elements: ', table_height)
+		print()
+
+	@staticmethod
+	def print_means(means):
 		print('Mean Rotation: ', means[0])
 		print('Mean Area: ', means[1])
 		print('Mean Length: ', means[2])
 		print('Mean Width: ', means[3])
 		print('Mean Height: ', means[4])
 		print('Mean Calibre: ', means[5])
-		print('----------------------------------------------------------------------------')
+
+	@staticmethod
+	def print_medians(medians):
 		print('Median Rotation: ', medians[0])
 		print('Median Area: ', medians[1])
 		print('Median Length: ', medians[2])
 		print('Median Width: ', medians[3])
 		print('Median Height: ', medians[4])
 		print('Median Calibre: ', medians[5])
-		print('----------------------------------------------------------------------------')
+
+	@staticmethod
+	def print_stds(stds):
 		print('StD Rotation: ', stds[0])
 		print('StD Area: ', stds[1])
 		print('StD Length: ', stds[2])
 		print('StD Width: ', stds[3])
 		print('StD Height: ', stds[4])
 		print('StD Calibre: ', stds[5])
-		print('----------------------------------------------------------------------------')
+
+	@staticmethod
+	def print_modes(modes):
 		print('Mode Rotation: ', modes[0])
 		print('Mode Area: ', modes[1])
 		print('Mode Length: ', modes[2])
 		print('Mode Width: ', modes[3])
 		print('Mode Height: ', modes[4])
 		print('Mode Calibre: ', modes[5])
-		print('----------------------------------------------------------------------------')
-		print('Elements: ', table_height)
-		print()
 
 	@staticmethod
 	def normalize(number):
@@ -214,40 +238,55 @@ class IPCLDiagnosis:
 		exponent = math.exp(-(math.pow(data - mean, 2) / (2 * math.pow(std, 2))))
 		return (1 / (math.sqrt(2 * math.pi) * std)) * exponent
 
-	@staticmethod
-	def save_statistical_data(means, medians, stds, modes, table_height, new_file):
+	def save_statistical_data(self, means, medians, stds, modes, table_height, new_file):
 		new_file.write('\n')
 		new_file.write('----------------------------------------------------------------------------\n')
+		self.write_means(means, new_file)
+		new_file.write('----------------------------------------------------------------------------\n')
+		self.write_medians(medians, new_file)
+		new_file.write('----------------------------------------------------------------------------\n')
+		self.write_stds(stds, new_file)
+		new_file.write('----------------------------------------------------------------------------\n')
+		self.write_modes(modes, new_file)
+		new_file.write('----------------------------------------------------------------------------\n')
+		new_file.write('Elements: ' + str(table_height))
+		new_file.write('\n')
+
+	@staticmethod
+	def write_means(means, new_file):
 		new_file.write('Mean Rotation: ' + str(means[0]) + '\n')
 		new_file.write('Mean Area: ' + str(means[1]) + '\n')
 		new_file.write('Mean Length: ' + str(means[2]) + '\n')
 		new_file.write('Mean Width: ' + str(means[3]) + '\n')
 		new_file.write('Mean Height: ' + str(means[4]) + '\n')
 		new_file.write('Mean Calibre: ' + str(means[5]) + '\n')
-		new_file.write('----------------------------------------------------------------------------\n')
+
+	@staticmethod
+	def write_medians(medians, new_file):
 		new_file.write('Median Rotation: ' + str(medians[0]) + '\n')
 		new_file.write('Median Area: ' + str(medians[1]) + '\n')
 		new_file.write('Median Length: ' + str(medians[2]) + '\n')
 		new_file.write('Median Width: ' + str(medians[3]) + '\n')
 		new_file.write('Median Height: ' + str(medians[4]) + '\n')
 		new_file.write('Median Calibre: ' + str(medians[5]) + '\n')
-		new_file.write('----------------------------------------------------------------------------\n')
+
+	@staticmethod
+	def write_stds(stds, new_file):
 		new_file.write('StD Rotation: ' + str(stds[0]) + '\n')
 		new_file.write('StD Area: ' + str(stds[1]) + '\n')
 		new_file.write('StD Length: ' + str(stds[2]) + '\n')
 		new_file.write('StD Width: ' + str(stds[3]) + '\n')
 		new_file.write('StD Height: ' + str(stds[4]) + '\n')
 		new_file.write('StD Calibre: ' + str(stds[5]) + '\n')
-		new_file.write('----------------------------------------------------------------------------\n')
+
+	@staticmethod
+	def write_modes(modes, new_file):
 		new_file.write('Mode Rotation: ' + str(modes[0]) + '\n')
 		new_file.write('Mode Area: ' + str(modes[1]) + '\n')
 		new_file.write('Mode Length: ' + str(modes[2]) + '\n')
 		new_file.write('Mode Width: ' + str(modes[3]) + '\n')
 		new_file.write('Mode Height: ' + str(modes[4]) + '\n')
 		new_file.write('Mode Calibre: ' + str(modes[5]) + '\n')
-		new_file.write('----------------------------------------------------------------------------\n')
-		new_file.write('Elements: ' + str(table_height))
-		new_file.write('\n')
 
 	def diagnose_by_type(self):
 		# [Type 1, Type 2, Type 3, Type 4, Type 5]
@@ -282,12 +321,7 @@ class IPCLDiagnosis:
 
 		feature_measurements = [rotation, area, length, width, height, calibre]
 
-		diagnoses = dict()
-		diagnoses['Type 1'] = 1
-		diagnoses['Type 2'] = 1
-		diagnoses['Type 3'] = 1
-		diagnoses['Type 4'] = 1
-		diagnoses['Type 5'] = 1
+		diagnoses = self.init_diagnoses()
 
 		self.diagnose_type_1(feature_measurements, diagnoses)
 		self.diagnose_type_2(feature_measurements, diagnoses)
@@ -299,6 +333,17 @@ class IPCLDiagnosis:
 		                         + diagnoses['Type 3'] + diagnoses['Type 4'] + diagnoses['Type 5']
 
 		self.print_results(diagnoses, normalisation_constant)
+
+	@staticmethod
+	def init_diagnoses():
+		diagnoses = dict()
+		diagnoses['Type 1'] = 1
+		diagnoses['Type 2'] = 1
+		diagnoses['Type 3'] = 1
+		diagnoses['Type 4'] = 1
+		diagnoses['Type 5'] = 1
+
+		return diagnoses
 
 	def diagnose_type_1(self, feature_measurements, diagnoses):
 		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Rotation'],
