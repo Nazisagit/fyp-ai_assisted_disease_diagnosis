@@ -8,10 +8,12 @@
 from python.IPCLDiagnosis import IPCLDiagnosis
 from python.ImageExtractor import ImageExtractor
 from python.FeatureDetector import FeatureDetector
+from processing.DataProcessing import DataProcessing
 import os
 
 # TODO
 # Diagnosis is not efficient enough and takes too long
+
 
 # Application main method
 def main():
@@ -44,6 +46,10 @@ def main():
     ipcl_diagnosis.analyse_feature_tables()
     ipcl_diagnosis.diagnose_by_type()
 
+    data_output = '../data_output/'
+    data_processing = DataProcessing(feature_tables, data_output)
+    data_processing.get_data()
+
 
     # Instantiate Disease Diagnoser
     # Get feature table resulting from performing feature detection
@@ -65,7 +71,6 @@ def main():
     # statisticsAnalyser = StatisticalAnalysis(original_images)
     # 4. Perform Statistics analysis (if needed)
     # statisticsAnalyser.analyse()
-
 
 # Call main function
 if __name__ == "__main__":

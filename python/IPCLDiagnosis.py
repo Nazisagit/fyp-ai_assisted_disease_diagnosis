@@ -6,6 +6,8 @@
 import numpy as np
 import math
 from collections import Counter
+########## 22/02/2019
+import csv
 
 # TODO
 # 1. Explore idea of recalculating probability of diagnosing next IPCL type if the first type and next type
@@ -30,9 +32,7 @@ class IPCLDiagnosis:
 		width_vector = list()
 		height_vector = list()
 		feature_vectors = list()
-
 		# Uncomment to save statistical data
-		# new_file = open(self.statistical_diagnoses_output + 'statistical_data.txt', 'w+')
 		for table in self.feature_tables:
 			table_height = len(table)
 			# For Rotation, Area, and Length
@@ -53,21 +53,18 @@ class IPCLDiagnosis:
 					elif feature == 4:
 						height_vector.append(table[row][feature])
 			calibre_vector = self.calculate_calibres(area_vector, length_vector)
-			self.append_feature_vectors(feature_vectors, rotation_vector, area_vector, length_vector,
-			                            width_vector, height_vector, calibre_vector)
+			self.append_feature_vectors(feature_vectors, rotation_vector, area_vector, length_vector, width_vector,
+			                            height_vector, calibre_vector)
 			means = self.calculate_means(feature_vectors)
 			medians = self.calculate_medians(feature_vectors)
 			stds = self.calculate_stds(feature_vectors)
 			modes = self.calculate_modes(feature_vectors)
-			self.add_to_stats(means, medians, stds, modes)
+			# Add to statistics for diagnosis
+			# self.add_to_statistics(means, medians, stds, modes)
+			# Save all the statistical data if need be
+			# self.save_statistical_data(means, medians, stds, modes)
 			# Uncomment to print each table
 			# self.print_to_console(means, medians, stds, modes, table_height)
-
-			# Uncomment to save statistical data
-			# self.save_statistical_data(means, medians, stds, modes, table_height, new_file)
-
-		# Uncomment to save statistical data
-		# new_file.close()
 
 	@staticmethod
 	def append_feature_vectors(features, rotation, area, length, width, height, calibre):
@@ -96,7 +93,7 @@ class IPCLDiagnosis:
 	def calculate_stds(vectors):
 		stds = list()
 		for vector in vectors:
-			stds.append(np.std(vector, dtype = np.float64))
+			stds.append(np.std(vector, dtype=np.float64))
 		return stds
 
 	def calculate_modes(self, vectors):
@@ -122,7 +119,7 @@ class IPCLDiagnosis:
 		else:
 			return []
 
-	def add_to_stats(self, means, medians, stds, modes):
+	def add_to_statistics(self, means, medians, stds, modes):
 		self.statistics.clear()
 		# Record the results in the dictionary in the state
 		self.add_to_means(means)
@@ -238,55 +235,55 @@ class IPCLDiagnosis:
 		exponent = math.exp(-(math.pow(data - mean, 2) / (2 * math.pow(std, 2))))
 		return (1 / (math.sqrt(2 * math.pi) * std)) * exponent
 
-	def save_statistical_data(self, means, medians, stds, modes, table_height, new_file):
-		new_file.write('\n')
-		new_file.write('----------------------------------------------------------------------------\n')
-		self.write_means(means, new_file)
-		new_file.write('----------------------------------------------------------------------------\n')
-		self.write_medians(medians, new_file)
-		new_file.write('----------------------------------------------------------------------------\n')
-		self.write_stds(stds, new_file)
-		new_file.write('----------------------------------------------------------------------------\n')
-		self.write_modes(modes, new_file)
-		new_file.write('----------------------------------------------------------------------------\n')
-		new_file.write('Elements: ' + str(table_height))
-		new_file.write('\n')
+	def save_statistical_data(self, means, medians, stds, modes):
+		self.save_means(means)
+		self.save_medians(medians)
+		self.save_stds(stds)
+		self.save_modes(modes)
 
-	@staticmethod
-	def write_means(means, new_file):
-		new_file.write('Mean Rotation: ' + str(means[0]) + '\n')
-		new_file.write('Mean Area: ' + str(means[1]) + '\n')
-		new_file.write('Mean Length: ' + str(means[2]) + '\n')
-		new_file.write('Mean Width: ' + str(means[3]) + '\n')
-		new_file.write('Mean Height: ' + str(means[4]) + '\n')
-		new_file.write('Mean Calibre: ' + str(means[5]) + '\n')
+	def save_means(self, means):
+		with open(self.statistical_diagnoses_output + 'means.csv', 'a', newline='') as means_file:
+			means_writer = csv.writer(means_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+			means_writer.writerow(('Mean', 'Value'))
+			means_writer.writerow(('Rotation', str(means[0])))
+			means_writer.writerow(('Area', str(means[1])))
+			means_writer.writerow(('Length', str(means[2])))
+			means_writer.writerow(('Width', str(means[3])))
+			means_writer.writerow(('Height', str(means[4])))
+			means_writer.writerow(('Calibre', str(means[5])))
 
-	@staticmethod
-	def write_medians(medians, new_file):
-		new_file.write('Median Rotation: ' + str(medians[0]) + '\n')
-		new_file.write('Median Area: ' + str(medians[1]) + '\n')
-		new_file.write('Median Length: ' + str(medians[2]) + '\n')
-		new_file.write('Median Width: ' + str(medians[3]) + '\n')
-		new_file.write('Median Height: ' + str(medians[4]) + '\n')
-		new_file.write('Median Calibre: ' + str(medians[5]) + '\n')
+	def save_medians(self, medians):
+		with open(self.statistical_diagnoses_output + 'medians.csv', 'w') as medians_file:
+			medians_writer = csv.writer(medians_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			medians_writer.writerow(('Median', 'Value'))
+			medians_writer.writerow(('Median Rotation', str(medians[0])))
+			medians_writer.writerow(('Median Area', str(medians[1])))
+			medians_writer.writerow(('Median Length', str(medians[2])))
+			medians_writer.writerow(('Median Width', str(medians[3])))
+			medians_writer.writerow(('Median Height', str(medians[4])))
+			medians_writer.writerow(('Median Calibre', str(medians[5])))
 
-	@staticmethod
-	def write_stds(stds, new_file):
-		new_file.write('StD Rotation: ' + str(stds[0]) + '\n')
-		new_file.write('StD Area: ' + str(stds[1]) + '\n')
-		new_file.write('StD Length: ' + str(stds[2]) + '\n')
-		new_file.write('StD Width: ' + str(stds[3]) + '\n')
-		new_file.write('StD Height: ' + str(stds[4]) + '\n')
-		new_file.write('StD Calibre: ' + str(stds[5]) + '\n')
+	def save_stds(self, stds):
+		with open(self.statistical_diagnoses_output + 'stds.csv', 'w') as stds_file:
+			stds_writer = csv.writer(stds_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			stds_writer.writerow(('StD', 'Value'))
+			stds_writer.writerow(('StD Rotation', str(stds[0])))
+			stds_writer.writerow(('StD Area', str(stds[1])))
+			stds_writer.writerow(('StD Length', str(stds[2])))
+			stds_writer.writerow(('StD Width', str(stds[3])))
+			stds_writer.writerow(('StD Height', str(stds[4])))
+			stds_writer.writerow(('StD Calibre', str(stds[5])))
 
-	@staticmethod
-	def write_modes(modes, new_file):
-		new_file.write('Mode Rotation: ' + str(modes[0]) + '\n')
-		new_file.write('Mode Area: ' + str(modes[1]) + '\n')
-		new_file.write('Mode Length: ' + str(modes[2]) + '\n')
-		new_file.write('Mode Width: ' + str(modes[3]) + '\n')
-		new_file.write('Mode Height: ' + str(modes[4]) + '\n')
-		new_file.write('Mode Calibre: ' + str(modes[5]) + '\n')
+	def save_modes(self, modes):
+		with open(self.statistical_diagnoses_output + 'modes.csv', 'w') as modes_file:
+			modes_writer = csv.writer(modes_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			modes_writer.writerow(('Mode', 'Value'))
+			modes_writer.writerow(('Mode Rotation', str(modes[0])))
+			modes_writer.writerow(('Mode Area', str(modes[1])))
+			modes_writer.writerow(('Mode Length', str(modes[2])))
+			modes_writer.writerow(('Mode Width', str(modes[3])))
+			modes_writer.writerow(('Mode Height', str(modes[4])))
+			modes_writer.writerow(('Mode Calibre', str(modes[5])))
 
 	def diagnose_by_type(self):
 		# [Type 1, Type 2, Type 3, Type 4, Type 5]
