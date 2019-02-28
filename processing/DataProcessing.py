@@ -4,7 +4,7 @@
 # Opened 23/02/2019
 
 import numpy as np
-import math
+import pandas as pd
 from collections import Counter
 import csv
 import os
@@ -12,16 +12,79 @@ import os
 
 class DataProcessing:
 
+	@staticmethod
+	def max_min_csv(data_input):
+		cols = ['Max', 'Min']
+		data = pd.read_csv(data_input, usecols=cols)
+		return max(data.Max), min(data.Min)
+
+
+class DataCollecting:
+
 	def __init__(self, feature_tables, data_output):
 		self.feature_tables = feature_tables
 		self.data_output = data_output
 
-	def get_data(self):
-		rotation_vector = list()
-		area_vector = list()
-		length_vector = list()
-		width_vector = list()
-		height_vector = list()
+	def init_output_files(self, ipcl_type):
+		output = self.data_output + ipcl_type
+		if not os.path.exists(output):
+			os.makedirs(output)
+		self.init_rotation_file(output)
+		self.init_area_file(output)
+		self.init_length_file(output)
+		self.init_width_file(output)
+		self.init_height_file(output)
+		self.init_calibre_file(output)
+
+	@staticmethod
+	def init_rotation_file(output):
+		rotation_file = open(output + 'rotation.csv', 'w', newline='')
+		rotation_writer = csv.writer(rotation_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+		rotation_writer.writerow(('Max', 'Min'))
+		rotation_file.close()
+
+	@staticmethod
+	def init_area_file(output):
+		area_file = open(output + 'area.csv', 'w', newline='')
+		area_writer = csv.writer(area_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+		area_writer.writerow(('Max', 'Min'))
+		area_file.close()
+
+	@staticmethod
+	def init_length_file(output):
+		length_file = open(output + 'length.csv', 'w', newline='')
+		length_writer = csv.writer(length_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+		length_writer.writerow(('Max', 'Min'))
+		length_file.close()
+
+	@staticmethod
+	def init_width_file(output):
+		width_file = open(output + 'width.csv', 'w', newline='')
+		width_writer = csv.writer(width_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+		width_writer.writerow(('Max', 'Min'))
+		width_file.close()
+
+	@staticmethod
+	def init_height_file(output):
+		height_file = open(output + 'height.csv', 'w', newline='')
+		height_writer = csv.writer(height_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+		height_writer.writerow(('Max', 'Min'))
+		height_file.close()
+
+	@staticmethod
+	def init_calibre_file(output):
+		calibre_file = open(output + 'calibre.csv', 'w', newline='')
+		calibre_writer = csv.writer(calibre_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+		calibre_writer.writerow(('Max', 'Min'))
+		calibre_file.close()
+
+	def save_data(self):
+		rotation_set = set()
+		area_set = set()
+		length_set = set()
+		width_set = set()
+		height_set = set()
+
 		for table in self.feature_tables:
 			table_height = len(table)
 			# For Rotation, Area, and Length
@@ -30,30 +93,24 @@ class DataProcessing:
 				for row in range(0, table_height):
 					# Calculate Total Rotation
 					if feature == 0:
-						rotation_vector.append(table[row][feature])
+						rotation_set.add(table[row][feature])
 					elif feature == 1:
-						area_vector.append(table[row][feature])
+						area_set.add(table[row][feature])
 					elif feature == 2:
-						length_vector.append(table[row][feature])
+						length_set.add(table[row][feature])
 					# Calculate Total Area
 					elif feature == 3:
-						width_vector.append(table[row][feature])
+						width_set.add(table[row][feature])
 					# Calculate Total Length
 					elif feature == 4:
-						height_vector.append(table[row][feature])
-			calibre_vector = self.calculate_calibres(area_vector, length_vector)
-			max_min_rotation = self.get_max_min(rotation_vector)
-			self.save_rotation(max_min_rotation, 'type1/')
-			max_min_area = self.get_max_min(area_vector)
-			self.save_area(max_min_area, 'type1/')
-			max_min_length = self.get_max_min(length_vector)
-			self.save_length(max_min_length, 'type1/')
-			max_min_width = self.get_max_min(width_vector)
-			self.save_width(max_min_width, 'type1/')
-			max_min_height = self.get_max_min(height_vector)
-			self.save_height(max_min_height, 'type1/')
-			max_min_calibre = self.get_max_min(calibre_vector)
-			self.save_calibre(max_min_calibre, 'type1/')
+						height_set.add(table[row][feature])
+			calibre_set = self.calculate_calibres(area_set, length_set)
+			self.save_rotation(max(rotation_set), min(rotation_set), 'type1/')
+			self.save_area(max(area_set), min(area_set), 'type1/')
+			self.save_length(max(length_set), min(length_set), 'type1/')
+			self.save_width(max(width_set), min(width_set), 'type1/')
+			self.save_height(max(height_set), min(height_set), 'type1/')
+			self.save_calibre(max(calibre_set), min(calibre_set), 'type1/')
 
 	@staticmethod
 	def calculate_calibres(area_vector, length_vector):
@@ -99,54 +156,39 @@ class DataProcessing:
 		else:
 			return []
 
-	@staticmethod
-	def get_max_min(vector):
-		return max(vector), min(vector)
-
-	def save_rotation(self, max_min_rotation, ipcl_type):
-		rotation = self.data_output + ipcl_type
-		if not os.path.exists(rotation):
-			os.makedirs(rotation)
-		with open(rotation + 'rotation.csv', 'a', newline='') as rotation_file:
+	def save_rotation(self, max_rotation, min_rotation, ipcl_type):
+		output = self.data_output + ipcl_type
+		with open(output + 'rotation.csv', 'a', newline='') as rotation_file:
 			rotation_writer = csv.writer(rotation_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-			rotation_writer.writerow(max_min_rotation[0], max_min_rotation[1])
+			rotation_writer.writerow((str(max_rotation), str(min_rotation)))
 
-	def save_area(self, max_min_area, ipcl_type):
-		area = self.data_output + ipcl_type
-		if not os.path.exists(area):
-			os.makedirs(area)
-		with open(area + 'area.csv', 'a', newline='') as area_file:
+	def save_area(self, max_area, min_area, ipcl_type):
+		output = self.data_output + ipcl_type
+		with open(output + 'area.csv', 'a', newline='') as area_file:
 			area_writer = csv.writer(area_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-			area_writer.writerow(max_min_area[0], max_min_area[1])
+			area_writer.writerow((str(max_area), str(min_area)))
 
-	def save_length(self, max_min_length, ipcl_type):
-		length = self.data_output + ipcl_type
-		if not os.path.exists(length):
-			os.makedirs(length)
-		with open(length + 'length.csv', 'a', newline='') as length_file:
+	def save_length(self, max_length, min_length, ipcl_type):
+		output = self.data_output + ipcl_type
+		with open(output + 'length.csv', 'a', newline='') as length_file:
 			length_writer = csv.writer(length_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-			length_writer.writerow(max_min_length[0], max_min_length[1])
+			length_writer.writerow((str(max_length), str(min_length)))
 
-	def save_width(self, max_min_width, ipcl_type):
-		width = self.data_output + ipcl_type
-		if not os.path.exists(width):
-			os.makedirs(width)
-		with open(width + 'width.csv', 'a', newline='') as width_file:
+	def save_width(self, max_width, min_width, ipcl_type):
+		output = self.data_output + ipcl_type
+		with open(output + 'width.csv', 'a', newline='') as width_file:
 			width_writer = csv.writer(width_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-			width_writer.writerow(max_min_width[0], max_min_width[1])
+			width_writer.writerow((str(max_width), str(min_width)))
 
-	def save_height(self, max_min_height, ipcl_type):
-		height = self.data_output + ipcl_type
-		if not os.path.exists(height):
-			os.makedirs(height)
-		with open(height + 'height.csv', 'a', newline='') as height_file:
+	def save_height(self, max_height, min_height, ipcl_type):
+		output = self.data_output + ipcl_type
+		with open(output + 'height.csv', 'a', newline='') as height_file:
 			height_writer = csv.writer(height_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-			height_writer.writerow(max_min_height[0], max_min_height[1])
+			height_writer.writerow((str(max_height), str(min_height)))
 
-	def save_calibre(self, max_min_calibre, ipcl_type):
-		calibre = self.data_output + ipcl_type
-		if not os.path.exists(calibre):
-			os.makedirs(calibre)
-		with open(calibre + 'calibre.csv', 'a', newline='') as calibre_file:
+	def save_calibre(self, max_calibre, min_calibre, ipcl_type):
+		output = self.data_output + ipcl_type
+		with open(output + 'calibre.csv', 'a', newline='') as calibre_file:
 			calibre_writer = csv.writer(calibre_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-			calibre_writer.writerow(max_min_calibre[0], max_min_calibre[1])
+			calibre_writer.writerow((str(max_calibre), str(min_calibre)))
+
