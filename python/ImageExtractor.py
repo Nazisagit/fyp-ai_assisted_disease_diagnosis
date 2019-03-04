@@ -61,7 +61,7 @@ class ImageExtractor:
 		mask_inverse = 255 - mask
 
 		# Identify the contours
-		_, contours, _ = cv2.findContours(mask_inverse, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+		contours, _ = cv2.findContours(mask_inverse, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 		# Initialize necessary variables
 		max_area, max_area_index = 0, 0
 		# Loop over the contours

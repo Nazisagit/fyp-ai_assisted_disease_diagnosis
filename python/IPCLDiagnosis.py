@@ -25,94 +25,85 @@ class IPCLDiagnosis:
 		self.statistics = dict()
 
 	def analyse_feature_tables(self):
-		# Define vectors necessary for calculation
-		rotation_vector = list()
-		area_vector = list()
-		length_vector = list()
-		width_vector = list()
-		height_vector = list()
-		feature_vectors = list()
-		# Uncomment to save statistical data
+		rotation_list = list()
+		area_list = list()
+		length_list = list()
+		width_list = list()
+		height_list = list()
+		feature_lists = list()
 		for table in self.feature_tables:
 			table_height = len(table)
-			# For Rotation, Area, and Length
 			for feature in [0, 1, 2, 3, 4]:
-				# For all entries in the table
 				for row in range(0, table_height):
-					# Calculate Total Rotation
 					if feature == 0:
-						rotation_vector.append(table[row][feature])
+						rotation_list.append(table[row][feature])
 					elif feature == 1:
-						area_vector.append(table[row][feature])
+						area_list.append(table[row][feature])
 					elif feature == 2:
-						length_vector.append(table[row][feature])
-					# Calculate Total Area
+						length_list.append(table[row][feature])
 					elif feature == 3:
-						width_vector.append(table[row][feature])
-					# Calculate Total Length
+						width_list.append(table[row][feature])
 					elif feature == 4:
-						height_vector.append(table[row][feature])
-			calibre_vector = self.calculate_calibres(area_vector, length_vector)
-			self.append_feature_vectors(feature_vectors, rotation_vector, area_vector, length_vector, width_vector,
-			                            height_vector, calibre_vector)
-			means = self.calculate_means(feature_vectors)
-			medians = self.calculate_medians(feature_vectors)
-			stds = self.calculate_stds(feature_vectors)
-			modes = self.calculate_modes(feature_vectors)
+						height_list.append(table[row][feature])
+			# calibre_vector = self.calculate_calibres(area_list, length_list)
+			self.append_feature_vectors(feature_lists, rotation_list, area_list, length_list, width_list, height_list)
+			means = self.calculate_means(feature_lists)
+			medians = self.calculate_medians(feature_lists)
+			stds = self.calculate_stds(feature_lists)
+			modes = self.calculate_modes(feature_lists)
 			# Add to statistics for diagnosis
-			# self.add_to_statistics(means, medians, stds, modes)
+			self.add_to_statistics(means, medians, stds, modes)
 			# Save all the statistical data if need be
 			# self.save_statistical_data(means, medians, stds, modes)
 			# Uncomment to print each table
 			# self.print_to_console(means, medians, stds, modes, table_height)
 
 	@staticmethod
-	def append_feature_vectors(features, rotation, area, length, width, height, calibre):
+	def append_feature_vectors(features, rotation, area, length, width, height):
 		features.append(rotation)
 		features.append(area)
 		features.append(length)
 		features.append(width)
 		features.append(height)
-		features.append(calibre)
 
 	@staticmethod
-	def calculate_means(vectors):
+	def calculate_means(lists):
 		means = list()
-		for vector in vectors:
-			means.append(np.mean(vector))
+		for elements in lists:
+			means.append(np.mean(elements))
 		return means
 
 	@staticmethod
-	def calculate_medians(vectors):
+	def calculate_medians(lists):
 		medians = list()
-		for vector in vectors:
-			medians.append(np.median(vector))
+		for elements in lists:
+			medians.append(np.median(elements))
 		return medians
 
 	@staticmethod
-	def calculate_stds(vectors):
+	def calculate_stds(lists):
 		stds = list()
-		for vector in vectors:
-			stds.append(np.std(vector, dtype=np.float64))
+		for elements in lists:
+			stds.append(np.std(elements, dtype=np.float64))
 		return stds
 
-	def calculate_modes(self, vectors):
+	def calculate_modes(self, lists):
 		modes = list()
-		for vector in vectors:
-			modes.append(self.get_mode(vector))
+		for elements in lists:
+			modes.append(self.get_mode(elements))
 		return modes
 
 	@staticmethod
-	def calculate_calibres(area_vector, length_vector):
-		calibre_vector = list()
-		for area in area_vector:
-			for length in length_vector:
-				calibre_vector.append(area/length)
-		return calibre_vector
+	def calculate_calibres(area_list, length_list):
+		calibre_list = list()
+		for area in area_list:
+			for length in length_list:
+				calibre_list.append(area/length)
+		return calibre_list
 
 	@staticmethod
-	def get_mode(vector):
-		counter = Counter(vector)
+	def get_mode(elements):
+		counter = Counter(elements)
 		if len(counter.most_common(1)) >= 1:
 			_, val = counter.most_common(1)[0]
 			return [x for x, y in counter.items() if y == val]
@@ -121,7 +112,6 @@ class IPCLDiagnosis:
 
 	def add_to_statistics(self, means, medians, stds, modes):
 		self.statistics.clear()
-		# Record the results in the dictionary in the state
 		self.add_to_means(means)
 		self.add_to_medians(medians)
 		self.add_to_stds(stds)
@@ -133,7 +123,6 @@ class IPCLDiagnosis:
 		self.statistics['Mean Length'] = means[2]
 		self.statistics['Mean Width'] = means[3]
 		self.statistics['Mean Height'] = means[4]
-		self.statistics['Mean Calibre'] = means[5]
 
 	def add_to_medians(self, medians):
 		self.statistics['Median Rotation'] = medians[0]
@@ -141,7 +130,6 @@ class IPCLDiagnosis:
 		self.statistics['Median Length'] = medians[2]
 		self.statistics['Median Width'] = medians[3]
 		self.statistics['Median Height'] = medians[4]
-		self.statistics['Median Calibre'] = medians[5]
 
 	def add_to_stds(self, stds):
 		self.statistics['StD Rotation'] = stds[0]
@@ -149,7 +137,6 @@ class IPCLDiagnosis:
 		self.statistics['StD Length'] = stds[2]
 		self.statistics['StD Width'] = stds[3]
 		self.statistics['StD Height'] = stds[4]
-		self.statistics['StD Calibre'] = stds[5]
 
 	def add_to_modes(self, modes):
 		self.statistics['Mode Rotation'] = modes[0]
@@ -157,7 +144,6 @@ class IPCLDiagnosis:
 		self.statistics['Mode Length'] = modes[2]
 		self.statistics['Mode Width'] = modes[3]
 		self.statistics['Mode Height'] = modes[4]
-		self.statistics['Mode Calibre'] = modes[5]
 
 	def print_statistical_data(self, means, medians, stds, modes, table_height):
 		print('----------------------------------------------------------------------------')
@@ -179,7 +165,6 @@ class IPCLDiagnosis:
 		print('Mean Length: ', means[2])
 		print('Mean Width: ', means[3])
 		print('Mean Height: ', means[4])
-		print('Mean Calibre: ', means[5])
 
 	@staticmethod
 	def print_medians(medians):
@@ -188,7 +173,6 @@ class IPCLDiagnosis:
 		print('Median Length: ', medians[2])
 		print('Median Width: ', medians[3])
 		print('Median Height: ', medians[4])
-		print('Median Calibre: ', medians[5])
 
 	@staticmethod
 	def print_stds(stds):
@@ -197,7 +181,6 @@ class IPCLDiagnosis:
 		print('StD Length: ', stds[2])
 		print('StD Width: ', stds[3])
 		print('StD Height: ', stds[4])
-		print('StD Calibre: ', stds[5])
 
 	@staticmethod
 	def print_modes(modes):
@@ -206,7 +189,6 @@ class IPCLDiagnosis:
 		print('Mode Length: ', modes[2])
 		print('Mode Width: ', modes[3])
 		print('Mode Height: ', modes[4])
-		print('Mode Calibre: ', modes[5])
 
 	@staticmethod
 	def normalize(number):
@@ -288,35 +270,30 @@ class IPCLDiagnosis:
 	def diagnose_by_type(self):
 		# [Type 1, Type 2, Type 3, Type 4, Type 5]
 		# Rotation
-		mean_rotation = [1, 2, 3, 4, 5]
-		std_rotation = [1, 2, 3, 4, 5]
+		mean_rotation = [42.762218, 40.947691, 40.304986, 41.538044, 41.63328]
+		std_rotation = [24.856679, 27.419118, 27.317437, 26.001473, 25.998956]
 		rotation = [mean_rotation, std_rotation]
 		# Area
-		mean_area = [1, 2, 3, 4, 5]
-		std_area = [1, 2, 3, 4, 5]
+		mean_area = [18.42872, 24.356245, 29.304159, 20.630282, 25.405012]
+		std_area = [21.509853, 28.316103, 69.969139, 24.624611, 37.663504]
 		area = [mean_area, std_area]
 
 		# Length
-		mean_length = [1, 2, 3, 4, 5]
-		std_length = [1, 2, 3, 4, 5]
+		mean_length = [21.954305, 19.521215, 19.195485, 20.298138, 21.058968]
+		std_length = [25.341883, 19.891479, 32.185072, 24.696921, 26.471581]
 		length = [mean_length, std_length]
 
 		# Width
-		mean_width = [1, 2, 3, 4, 5]
-		std_width = [1, 2, 3, 4, 5]
+		mean_width = [9.346334, 9.078073, 9.132982, 8.928902, 9.368635]
+		std_width = [18.73465, 12.9983, 20.3663, 19.162447, 15.812641]
 		width = [mean_width, std_width]
 
 		# Height
-		mean_height = [1, 2, 3, 4, 5]
-		std_height = [1, 2, 3, 4, 5]
+		mean_height = [8.700651, 8.353444, 8.573133, 8.156304, 8.348297]
+		std_height = [12.568666, 9.646411, 14.358488, 9.35614, 11.19423]
 		height = [mean_height, std_height]
 
-		# Calibre
-		mean_calibre = [1, 2, 3, 4, 5]
-		std_calibre = [1, 2, 3, 4, 5]
-		calibre = [mean_calibre, std_calibre]
-
-		feature_measurements = [rotation, area, length, width, height, calibre]
+		feature_measurements = [rotation, area, length, width, height]
 
 		diagnoses = self.init_diagnoses()
 
@@ -353,8 +330,6 @@ class IPCLDiagnosis:
 		                                                  feature_measurements[3][0][0], feature_measurements[3][1][0])
 		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Height'],
 		                                                  feature_measurements[4][0][0], feature_measurements[4][1][0])
-		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Calibre'],
-		                                                  feature_measurements[5][0][0], feature_measurements[5][1][0])
 
 	def diagnose_type_2(self, feature_measurements, diagnoses):
 		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Rotation'],
@@ -367,9 +342,6 @@ class IPCLDiagnosis:
 		                                                  feature_measurements[3][0][1], feature_measurements[3][1][1])
 		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Height'],
 		                                                  feature_measurements[4][0][1], feature_measurements[4][1][1])
-		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Calibre'],
-		                                                  feature_measurements[5][0][1], feature_measurements[5][1][1])
-
 	def diagnose_type_3(self, feature_measurements, diagnoses):
 		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Rotation'],
 		                                                  feature_measurements[0][0][2], feature_measurements[0][1][2])
@@ -381,8 +353,6 @@ class IPCLDiagnosis:
 		                                                  feature_measurements[3][0][2], feature_measurements[3][1][2])
 		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Height'],
 		                                                  feature_measurements[4][0][2], feature_measurements[4][1][2])
-		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Calibre'],
-		                                                  feature_measurements[5][0][2], feature_measurements[5][1][2])
 
 	def diagnose_type_4(self, feature_measurements, diagnoses):
 		diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Rotation'],
@@ -395,8 +365,6 @@ class IPCLDiagnosis:
 		                                                  feature_measurements[3][0][3], feature_measurements[3][1][3])
 		diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Height'],
 		                                                  feature_measurements[4][0][3], feature_measurements[4][1][3])
-		diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Calibre'],
-		                                                  feature_measurements[5][0][3], feature_measurements[5][1][3])
 
 	def diagnose_type_5(self, feature_measurements, diagnoses):
 		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Rotation'],
@@ -409,8 +377,6 @@ class IPCLDiagnosis:
 		                                                  feature_measurements[3][0][4], feature_measurements[3][1][4])
 		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Height'],
 		                                                  feature_measurements[4][0][4], feature_measurements[4][1][4])
-		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Calibre'],
-		                                                  feature_measurements[5][0][4], feature_measurements[5][1][4])
 
 	@staticmethod
 	def print_results(diagnoses, normalisation_constant):

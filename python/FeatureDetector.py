@@ -61,10 +61,10 @@ class FeatureDetector:
                 # storing results in a feature table
                 self.extract_features(str(file), frame, self.adaptive_threshold_clustering(frame))
 
-
     # Finds the four triangles in each corner and mask them. Returns the
     # resulting binary image.
-    def mask_corners(self, frame):
+    @staticmethod
+    def mask_corners(frame):
         # Define the range of white color in HSV
         ########## 06/02/2019
         # lower_black = np.array([0, 0, 0])
@@ -140,7 +140,8 @@ class FeatureDetector:
 
     # Performs adaptive threshold on the whole frame to identify
     # clusters of blobs that are close together, i.e. finds ROI
-    def adaptive_threshold_clustering(self, frame):
+    @staticmethod
+    def adaptive_threshold_clustering(frame):
         # Convert the frame to greyscale
         grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Perform contrast limited adaptive histogram equalization (CLAHE)
@@ -157,7 +158,8 @@ class FeatureDetector:
         return thresh
 
     # Performs adaptive threshold on the ROI to identify vein structures
-    def adaptive_threshold_roi(self, frame):
+    @staticmethod
+    def adaptive_threshold_roi(frame):
         # Convert the frame to greyscale
         grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -169,7 +171,7 @@ class FeatureDetector:
         thresh = cv2.adaptiveThreshold(equalized, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 25, 13)
 
         # Identify the contours in the mask
-        _, contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         # Initialize a mask that will contain bad blobs (the ones that
         # would need to be filtered by area)
         mask = np.ones(frame.shape[:2], dtype="uint8") * 255
@@ -228,7 +230,7 @@ class FeatureDetector:
 
         # Find the biggest blob...
         # Get the contours
-        _, contours, _ = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         # Initialize necessary variables
         maxArea, maxAreaIndex = 0, 0
         # Loop over the contours
@@ -251,7 +253,7 @@ class FeatureDetector:
         # all parts that are not necessary for analysis
         maskInverse = 255 - temp
         img = frame.copy()
-        _, contours, _ = cv2.findContours(maskInverse, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(maskInverse, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(img, contours, -1, 0, -1)
 
         # Crop the frame and the mask so that it has only the ROI
@@ -314,7 +316,7 @@ class FeatureDetector:
 
             # Perform feature extraction for each blob...
             # Identify the contours in the binary roi and copy the roi
-            _, contours, _ = cv2.findContours(binaryROI, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            contours, _ = cv2.findContours(binaryROI, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             output = roi.copy()
             # Loop all contours
             for c in contours:
@@ -333,10 +335,6 @@ class FeatureDetector:
                     mask = np.zeros(binaryROI.shape, np.uint8)
                     cv2.drawContours(mask, [c], 0, 255, -1)
 
-                    # Get the mean BGR colour of the blob
-                    blue, green, red, _ = cv2.mean(roi, mask=mask)
-                    meanColour = (red, green, blue)
-
                     # Get the bounding rectangle around the blob, taking into
                     # account its area and rotation
                     rect = cv2.minAreaRect(c)
@@ -347,9 +345,6 @@ class FeatureDetector:
                     # Get the length of the contour
                     length = float(self.line_length(mask))
 
-                    # Create new table row entry
-                    # [['(X, Y) Coordinate', 'Width', 'Height', 'Rotation', 'Area', 'Colour (R,G,B)', 'Length']]
-                    # row = [rect[0], rect[1][0], rect[1][1], rect[2], area, meanColour, length]
                     # ['Rotation', 'Area', 'Length', 'Width', 'Height']
                     row = [rect[2], area,  length, rect[1][0], rect[1][1]]
                     # Add that new row to the feature table
@@ -417,7 +412,8 @@ class FeatureDetector:
             return False
 
     # Produces the skeleton of the blob and counts all non-zero pixels
-    def line_length(self, mask):
+    @staticmethod
+    def line_length(mask):
         # Copy mask
         img = mask.copy()
         # Define size of skeleton blob
@@ -444,7 +440,8 @@ class FeatureDetector:
 
     # Performs HSV colour threshold on the image based on the upper and
     # lower threshold values provided and returns the resulting mask.
-    def hsv_colour_threshold(self, frame, lower_value, upper_value):
+    @staticmethod
+    def hsv_colour_threshold(frame, lower_value, upper_value):
         # Convert RGB frame to HSV for better colour separation
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -492,7 +489,8 @@ class FeatureDetector:
         return self.number_ipcls
 
     # Prints the progress bar of video analysis to the console.
-    def show_progressbar(self, iteration, total, fill='█'):
+    @staticmethod
+    def show_progressbar(iteration, total, fill='█'):
         # The code is taken from:
         # https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
         percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
