@@ -126,17 +126,17 @@ class FeatureDetector:
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         dilated = cv2.dilate(mask, kernel, iterations=1)
         # # Perform morphological closing to get rid of holes inside the mask
-        reducedHoles = cv2.morphologyEx(dilated, cv2.MORPH_CLOSE, np.ones((10, 10), np.uint8))
+        reduced_holes = cv2.morphologyEx(dilated, cv2.MORPH_CLOSE, np.ones((10, 10), np.uint8))
         # # Perform flood fill to close all holes that are left
-        # floodFill = reducedHoles.copy()
-        # h, w = reducedHoles.shape[:2]
-        # temp = np.zeros((h + 2, w + 2), np.uint8)
-        # cv2.floodFill(floodFill, temp, (0, 0), 255)
-        # floodFillInv = cv2.bitwise_not(floodFill)
-        # noHoles = reducedHoles | floodFillInv
+        flood_fill = reduced_holes.copy()
+        h, w = reduced_holes.shape[:2]
+        temp = np.zeros((h + 2, w + 2), np.uint8)
+        cv2.floodFill(flood_fill, temp, (0, 0), 255)
+        flood_fill_inv = cv2.bitwise_not(flood_fill)
+        no_holes = reduced_holes | flood_fill_inv
 
         # Return the result
-        return reducedHoles
+        return no_holes
 
     # Performs adaptive threshold on the whole frame to identify
     # clusters of blobs that are close together, i.e. finds ROI
@@ -212,14 +212,14 @@ class FeatureDetector:
     # to the initial frame size
     def get_roi(self, frame, mask):
         # Identify the four rectangles in each corner
-        cornersBinary = self.mask_corners(frame)
+        corners_binary = self.mask_corners(frame)
         # Identify glare in the frame
-        glareBinary = self.mask_glare(frame)
+        glare_binary = self.mask_glare(frame)
         # Combine the two masks
-        subtractMask = cv2.add(cornersBinary, glareBinary)
+        subtract_mask = cv2.add(corners_binary, glare_binary)
 
         # Subtract the masks defined above from the frame
-        filtered = cv2.subtract(mask, subtractMask)
+        filtered = cv2.subtract(mask, subtract_mask)
 
         # Perform some morphology...
         # Perform morphological closing to group together blobs that are close to each other
@@ -232,28 +232,28 @@ class FeatureDetector:
         # Get the contours
         contours, _ = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         # Initialize necessary variables
-        maxArea, maxAreaIndex = 0, 0
+        max_area, max_area_index = 0, 0
         # Loop over the contours
         for index, c in enumerate(contours):
             # Get area of the current blob
             area = cv2.contourArea(c)
             # Check if the area of current blob is greater than previous maxArea
-            if area > maxArea:
+            if area > max_area:
                 # Record this area as maxArea and record its index
-                maxArea = area
-                maxAreaIndex = index
+                max_area = area
+                max_area_index = index
 
         # Create an empty mask of the size of original frame
         temp = np.zeros_like(clustered)
 
         # Draw the blobs on the frame and the mask filling the holes
-        cv2.drawContours(temp, contours, maxAreaIndex, 255, -1)
+        cv2.drawContours(temp, contours, max_area_index, 255, -1)
 
         # Overlay the inverse of mask over the frame to eliminate
         # all parts that are not necessary for analysis
-        maskInverse = 255 - temp
+        mask_inverse = 255 - temp
         img = frame.copy()
-        contours, _ = cv2.findContours(maskInverse, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(mask_inverse, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(img, contours, -1, 0, -1)
 
         # Crop the frame and the mask so that it has only the ROI
@@ -265,58 +265,58 @@ class FeatureDetector:
             (topX, topY) = (np.min(x), np.min(y))
             (bottomX, bottomY) = (np.max(x), np.max(y))
         img = img[topX:bottomX + 1, topY:bottomY + 1]
-        maskInverse = maskInverse[topX:bottomX + 1, topY:bottomY + 1]
+        mask_inverse = mask_inverse[topX:bottomX + 1, topY:bottomY + 1]
 
         # To illustrate the results uncomment the lines below
-        # fig = plt.figure()
-        # plt.subplot(231)
-        # plt.imshow(frame)
-        # plt.title('Original Frame')
-        # plt.subplot(232)
-        # plt.imshow(cornersBinary)
-        # plt.title('Mask Triangles In Each Corner')
-        # plt.subplot(233)
-        # plt.imshow(glareBinary)
-        # plt.title('Mask Glare')
-        # plt.subplot(234)
-        # plt.imshow(subtractMask)
-        # plt.title('Subtract Mask')
-        # plt.subplot(235)
-        # plt.imshow(opening)
-        # plt.title('Subtract Constraints & Perform Morphology')
-        # plt.subplot(236)
-        # plt.imshow(img)
-        # plt.title('ROI')
-        # plt.suptitle('Step 2. Extraction of ROI.', fontsize=16)
+        fig = plt.figure()
+        plt.subplot(231)
+        plt.imshow(frame)
+        plt.title('Original Frame')
+        plt.subplot(232)
+        plt.imshow(corners_binary)
+        plt.title('Mask Triangles In Each Corner')
+        plt.subplot(233)
+        plt.imshow(glare_binary)
+        plt.title('Mask Glare')
+        plt.subplot(234)
+        plt.imshow(subtract_mask)
+        plt.title('Subtract Mask')
+        plt.subplot(235)
+        plt.imshow(opening)
+        plt.title('Subtract Constraints & Perform Morphology')
+        plt.subplot(236)
+        plt.imshow(img)
+        plt.title('ROI')
+        plt.suptitle('Step 2. Extraction of ROI.', fontsize=16)
         # If multiple matplotlib windows are opened at the same
         # time uncomment the block=False line
         plt.show()#(block=False)
 
         # Return the ROI together with the mask that corresponds to that roi
         # and the percentage value of the roi relative to the initial frame size
-        return img, maskInverse, img.size / frame.size
+        return img, mask_inverse, img.size / frame.size
 
     # Counts the number of blobs in the frame, and for each
     # blob identifies it's length and colour
     ########## 12/02/2019 Added name of file to save the detected features images
     def extract_features(self, name, frame, mask):
         # Get the current region of interest
-        roi, mask, percentageROI = self.get_roi(frame, mask)
+        roi, mask, percentage_roi = self.get_roi(frame, mask)
 
         # Only perform feature extraction if the extracted ROI
         # contains at least 5 percent of the frame
-        if percentageROI > 0.05:
+        if percentage_roi > 0.05:
 
             # Threshold the necessary data from the roi
-            binaryROI = self.adaptive_threshold_roi(roi)
+            binary_roi = self.adaptive_threshold_roi(roi)
 
             # Subtract the inverse of the roi mask from the threshold
             # image to eliminate border edges
-            binaryROI = cv2.subtract(binaryROI, mask)
+            binary_roi = cv2.subtract(binary_roi, mask)
 
             # Perform feature extraction for each blob...
             # Identify the contours in the binary roi and copy the roi
-            contours, _ = cv2.findContours(binaryROI, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            contours, _ = cv2.findContours(binary_roi, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             output = roi.copy()
             # Loop all contours
             for c in contours:
@@ -324,15 +324,15 @@ class FeatureDetector:
                 # Get blob dimensions and location
                 x, y, w, h = cv2.boundingRect(c)
                 # Crop the image containing the blob from ROI
-                blobMask = np.zeros(roi.shape[:2], np.uint8)
-                cv2.drawContours(blobMask, [c], -1, 255, -1)
-                blob = cv2.bitwise_and(roi, roi, mask=blobMask)
+                blob_mask = np.zeros(roi.shape[:2], np.uint8)
+                cv2.drawContours(blob_mask, [c], -1, 255, -1)
+                blob = cv2.bitwise_and(roi, roi, mask=blob_mask)
                 blob = blob[y:y + h, x:x + w]
 
                 # Make sure blob has no glare
                 if not self.is_glare(blob):
                     # Create a mask containing this blob
-                    mask = np.zeros(binaryROI.shape, np.uint8)
+                    mask = np.zeros(binary_roi.shape, np.uint8)
                     cv2.drawContours(mask, [c], 0, 255, -1)
 
                     # Get the bounding rectangle around the blob, taking into
@@ -369,7 +369,7 @@ class FeatureDetector:
 
             # Save images for inspection. Can be used to assess accuracy.
             cv2.imwrite(self.output_folder + '_roi_' + name, roi)
-            cv2.imwrite(self.output_folder + '_binary_roi_' + name, binaryROI)
+            cv2.imwrite(self.output_folder + '_binary_roi_' + name, binary_roi)
             cv2.imwrite(self.output_folder + '_final_output_' + name, output)
 
             # To illustrate the results uncomment the lines below
@@ -392,15 +392,15 @@ class FeatureDetector:
     def is_glare(self, blob):
         # Define the range of white color in HSV
         # These threshold are less sensitive to glare, but produce more results
-        # lower_white = np.array([4, 8, 237])
-        # upper_white = np.array([150, 102, 255])
+        lower_white = np.array([4, 8, 237])
+        upper_white = np.array([150, 102, 255])
 
         # If you want all of the glare to be deleted, uncomment the
         # ranges below and comment the ranges above.
         # However, this did not turn out to be efficient as a lot
         # of actual IPCL data is lost.
-        lower_white = np.array([4, 8, 165])
-        upper_white = np.array([150, 126, 255])
+        # lower_white = np.array([4, 8, 165])
+        # upper_white = np.array([150, 126, 255])
 
         # Threshold the HSV image to mark the glare parts as foreground
         mask = self.hsv_colour_threshold(blob, lower_white, upper_white)
@@ -475,10 +475,6 @@ class FeatureDetector:
             # print('{:^76}'.format('TOTAL: ' + str(len(self.featureTable))))
             print('---------------------------------------------------------------------------------------------\n')
 
-    # Getter for feature table
-    def get_feature_table(self):
-        return self.feature_table
-
     ########## 14/02/2019
     def get_feature_tables(self):
         return self.feature_tables
@@ -523,7 +519,3 @@ class FeatureDetector:
             new_file.write('-------------------------------------------------------------------------\n')
             new_file.write('\n')
         new_file.close()
-        return 0
-
-
-

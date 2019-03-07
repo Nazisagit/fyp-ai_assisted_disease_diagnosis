@@ -5,7 +5,8 @@
 
 
 # Import necessary classes:
-from python.IPCLDiagnosis import IPCLDiagnosis
+from python.TypeDiagnosis import TypeDiagnosis
+from python.GroupDiagnosis import GroupDiagnosis
 from python.ImageExtractor import ImageExtractor
 from python.FeatureDetector import FeatureDetector
 from processing.DataProcessing import DataProcessing, DataCollecting
@@ -18,14 +19,18 @@ import os
 # Application main method
 def main():
     # Instantiate necessary classes:
-
     type1 = 'type1/'
     type2 = 'type2/'
     type3 = 'type3/'
     type4 = 'type4/'
     type5 = 'type5/'
-    patient_number = '0010092102d'
-    patient_date = '2017-12-08'
+
+    group1 = 'group1/'
+    group2 = 'group2/'
+    group3 = 'group3/'
+
+    patient_number = '0007087501d'
+    patient_date = '2017-12-22'
     original_images = '../Student Data/' + patient_number + '/' + patient_date + '/'
     extracted_images = '../extracted_images/' + patient_number + '/' + patient_date + '/'
     detected_features = '../detected_features/' + patient_number + '/' + patient_date + '/'
@@ -33,37 +38,18 @@ def main():
 
     extract_images(original_images, extracted_images)
     feature_tables = detect_features(extracted_images, detected_features)
-    #
-    # data_collecting = DataCollecting(feature_tables, data_output, type5)
+
+    # data_collecting = DataCollecting(feature_tables, data_output, group2)
     # data_collecting.init_output_files()
     # data_collecting.save_data()
 
     # process_data(data_output, type5)
 
-    ipcl_diagnosis = IPCLDiagnosis(feature_tables, detected_features)
-    ipcl_diagnosis.analyse_feature_tables()
-    ipcl_diagnosis.diagnose_by_type()
-
-    # Instantiate Disease Diagnoser
-    # Get feature table resulting from performing feature detection
-    # featureTable = featureDetector.get_feature_table()
-    # Get the list that contains the number of IPCLs extracted
-    # per each frame with feature detection
-    # numberIPCLs = featureDetector.get_number_ipcls()
-    # Instantiate Diagnoser class
-    # diseaseDiagnoser = Diagnoser(featureTable, numberIPCLs)
-    # Step 3: Perform Disease Diagnosis
-    # diseaseDiagnoser.diagnose()
-    # diseaseDiagnoser.naiveBayes()
-
-    # Instantiate Statistical Analysis Class (if needed)
-    # Define the folder that contains the frames for
-    # which statistical analysis has to be performed
-    # in the form: './path_to_your_folder/'
-    # inputFolder = './temp/frames/'
-    # statisticsAnalyser = StatisticalAnalysis(original_images)
-    # 4. Perform Statistics analysis (if needed)
-    # statisticsAnalyser.analyse()
+    # type_diagnosis = TypeDiagnosis(feature_tables, detected_features)
+    # type_diagnosis.analyse_feature_tables()
+    #
+    # group_diagnosis = GroupDiagnosis(feature_tables, detected_features)
+    # group_diagnosis.analyse_feature_tables()
 
 
 def extract_images(original_images, extracted_images):
@@ -77,9 +63,7 @@ def extract_images(original_images, extracted_images):
 def detect_features(extracted_images, detected_features):
     if not os.path.exists(detected_features):
         os.makedirs(detected_features)
-    # # # Instantiate Feature Detector class
     feature_detector = FeatureDetector(extracted_images, detected_features)
-    # # # Step 2: Perform Feature Detection
     feature_detector.run()
     return feature_detector.get_feature_tables()
 

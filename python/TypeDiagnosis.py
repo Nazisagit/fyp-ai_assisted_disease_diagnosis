@@ -6,23 +6,19 @@
 import numpy as np
 import math
 from collections import Counter
-########## 22/02/2019
-import csv
 
 # TODO
-# 1. Explore idea of recalculating probability of diagnosing next IPCL type if the first type and next type
-#    fall within a threshold
-# 2.
+# 1. Implement voting system
 
 
-class IPCLDiagnosis:
+class TypeDiagnosis:
 
 	def __init__(self, feature_tables, statistical_diagnoses_output):
 		self.feature_tables = feature_tables
-
 		self.statistical_diagnoses_output = statistical_diagnoses_output
-
+		self.diagnoses = dict()
 		self.statistics = dict()
+		self.votes = list()
 
 	def analyse_feature_tables(self):
 		rotation_list = list()
@@ -45,18 +41,14 @@ class IPCLDiagnosis:
 						width_list.append(table[row][feature])
 					elif feature == 4:
 						height_list.append(table[row][feature])
-			# calibre_vector = self.calculate_calibres(area_list, length_list)
 			self.append_feature_vectors(feature_lists, rotation_list, area_list, length_list, width_list, height_list)
 			means = self.calculate_means(feature_lists)
 			medians = self.calculate_medians(feature_lists)
 			stds = self.calculate_stds(feature_lists)
 			modes = self.calculate_modes(feature_lists)
-			# Add to statistics for diagnosis
 			self.add_to_statistics(means, medians, stds, modes)
-			# Save all the statistical data if need be
-			# self.save_statistical_data(means, medians, stds, modes)
-			# Uncomment to print each table
-			# self.print_to_console(means, medians, stds, modes, table_height)
+			self.diagnose_by_type()
+		self.determine_vote()
 
 	@staticmethod
 	def append_feature_vectors(features, rotation, area, length, width, height):
@@ -92,14 +84,6 @@ class IPCLDiagnosis:
 		for elements in lists:
 			modes.append(self.get_mode(elements))
 		return modes
-
-	@staticmethod
-	def calculate_calibres(area_list, length_list):
-		calibre_list = list()
-		for area in area_list:
-			for length in length_list:
-				calibre_list.append(area/length)
-		return calibre_list
 
 	@staticmethod
 	def get_mode(elements):
@@ -145,127 +129,11 @@ class IPCLDiagnosis:
 		self.statistics['Mode Width'] = modes[3]
 		self.statistics['Mode Height'] = modes[4]
 
-	def print_statistical_data(self, means, medians, stds, modes, table_height):
-		print('----------------------------------------------------------------------------')
-		self.print_means(means)
-		print('----------------------------------------------------------------------------')
-		self.print_medians(medians)
-		print('----------------------------------------------------------------------------')
-		self.print_stds(stds)
-		print('----------------------------------------------------------------------------')
-		self.print_modes(modes)
-		print('----------------------------------------------------------------------------')
-		print('Elements: ', table_height)
-		print()
-
-	@staticmethod
-	def print_means(means):
-		print('Mean Rotation: ', means[0])
-		print('Mean Area: ', means[1])
-		print('Mean Length: ', means[2])
-		print('Mean Width: ', means[3])
-		print('Mean Height: ', means[4])
-
-	@staticmethod
-	def print_medians(medians):
-		print('Median Rotation: ', medians[0])
-		print('Median Area: ', medians[1])
-		print('Median Length: ', medians[2])
-		print('Median Width: ', medians[3])
-		print('Median Height: ', medians[4])
-
-	@staticmethod
-	def print_stds(stds):
-		print('StD Rotation: ', stds[0])
-		print('StD Area: ', stds[1])
-		print('StD Length: ', stds[2])
-		print('StD Width: ', stds[3])
-		print('StD Height: ', stds[4])
-
-	@staticmethod
-	def print_modes(modes):
-		print('Mode Rotation: ', modes[0])
-		print('Mode Area: ', modes[1])
-		print('Mode Length: ', modes[2])
-		print('Mode Width: ', modes[3])
-		print('Mode Height: ', modes[4])
-
-	@staticmethod
-	def normalize(number):
-		return (number * 100) - 100
-
-	# Flattens the list. Used to diagnose mode features when multiple modes are present
-	@staticmethod
-	def flatten(values):
-		# Define an output list
-		output = []
-
-		# Loop all values
-		for value in values:
-			if value is not None:
-				if value[0] == True or value[0] == False:
-					output.append(value)
-				else:
-					for element in value:
-						output.append(element)
-
-		return output
-
 	@staticmethod
 	def calculate_probability(data, mean, std):
 		# Calculate probability of belonging to the class
 		exponent = math.exp(-(math.pow(data - mean, 2) / (2 * math.pow(std, 2))))
 		return (1 / (math.sqrt(2 * math.pi) * std)) * exponent
-
-	def save_statistical_data(self, means, medians, stds, modes):
-		self.save_means(means)
-		self.save_medians(medians)
-		self.save_stds(stds)
-		self.save_modes(modes)
-
-	def save_means(self, means):
-		with open(self.statistical_diagnoses_output + 'means.csv', 'a', newline='') as means_file:
-			means_writer = csv.writer(means_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-			means_writer.writerow(('Mean', 'Value'))
-			means_writer.writerow(('Rotation', str(means[0])))
-			means_writer.writerow(('Area', str(means[1])))
-			means_writer.writerow(('Length', str(means[2])))
-			means_writer.writerow(('Width', str(means[3])))
-			means_writer.writerow(('Height', str(means[4])))
-			means_writer.writerow(('Calibre', str(means[5])))
-
-	def save_medians(self, medians):
-		with open(self.statistical_diagnoses_output + 'medians.csv', 'w') as medians_file:
-			medians_writer = csv.writer(medians_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-			medians_writer.writerow(('Median', 'Value'))
-			medians_writer.writerow(('Median Rotation', str(medians[0])))
-			medians_writer.writerow(('Median Area', str(medians[1])))
-			medians_writer.writerow(('Median Length', str(medians[2])))
-			medians_writer.writerow(('Median Width', str(medians[3])))
-			medians_writer.writerow(('Median Height', str(medians[4])))
-			medians_writer.writerow(('Median Calibre', str(medians[5])))
-
-	def save_stds(self, stds):
-		with open(self.statistical_diagnoses_output + 'stds.csv', 'w') as stds_file:
-			stds_writer = csv.writer(stds_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-			stds_writer.writerow(('StD', 'Value'))
-			stds_writer.writerow(('StD Rotation', str(stds[0])))
-			stds_writer.writerow(('StD Area', str(stds[1])))
-			stds_writer.writerow(('StD Length', str(stds[2])))
-			stds_writer.writerow(('StD Width', str(stds[3])))
-			stds_writer.writerow(('StD Height', str(stds[4])))
-			stds_writer.writerow(('StD Calibre', str(stds[5])))
-
-	def save_modes(self, modes):
-		with open(self.statistical_diagnoses_output + 'modes.csv', 'w') as modes_file:
-			modes_writer = csv.writer(modes_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-			modes_writer.writerow(('Mode', 'Value'))
-			modes_writer.writerow(('Mode Rotation', str(modes[0])))
-			modes_writer.writerow(('Mode Area', str(modes[1])))
-			modes_writer.writerow(('Mode Length', str(modes[2])))
-			modes_writer.writerow(('Mode Width', str(modes[3])))
-			modes_writer.writerow(('Mode Height', str(modes[4])))
-			modes_writer.writerow(('Mode Calibre', str(modes[5])))
 
 	def diagnose_by_type(self):
 		# [Type 1, Type 2, Type 3, Type 4, Type 5]
@@ -295,29 +163,20 @@ class IPCLDiagnosis:
 
 		feature_measurements = [rotation, area, length, width, height]
 
-		diagnoses = self.init_diagnoses()
+		self.init_diagnoses_type()
+		self.diagnose_type_1(feature_measurements, self.diagnoses)
+		self.diagnose_type_2(feature_measurements, self.diagnoses)
+		self.diagnose_type_3(feature_measurements, self.diagnoses)
+		self.diagnose_type_4(feature_measurements, self.diagnoses)
+		self.diagnose_type_5(feature_measurements, self.diagnoses)
+		self.votes.append(self.vote_for_type(self.diagnoses))
 
-		self.diagnose_type_1(feature_measurements, diagnoses)
-		self.diagnose_type_2(feature_measurements, diagnoses)
-		self.diagnose_type_3(feature_measurements, diagnoses)
-		self.diagnose_type_4(feature_measurements, diagnoses)
-		self.diagnose_type_5(feature_measurements, diagnoses)
-
-		normalisation_constant = diagnoses['Type 1'] + diagnoses['Type 2']\
-		                         + diagnoses['Type 3'] + diagnoses['Type 4'] + diagnoses['Type 5']
-
-		self.print_results(diagnoses, normalisation_constant)
-
-	@staticmethod
-	def init_diagnoses():
-		diagnoses = dict()
-		diagnoses['Type 1'] = 1
-		diagnoses['Type 2'] = 1
-		diagnoses['Type 3'] = 1
-		diagnoses['Type 4'] = 1
-		diagnoses['Type 5'] = 1
-
-		return diagnoses
+	def init_diagnoses_type(self):
+		self.diagnoses['Type 1'] = 1
+		self.diagnoses['Type 2'] = 1
+		self.diagnoses['Type 3'] = 1
+		self.diagnoses['Type 4'] = 1
+		self.diagnoses['Type 5'] = 1
 
 	def diagnose_type_1(self, feature_measurements, diagnoses):
 		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Rotation'],
@@ -342,6 +201,7 @@ class IPCLDiagnosis:
 		                                                  feature_measurements[3][0][1], feature_measurements[3][1][1])
 		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Height'],
 		                                                  feature_measurements[4][0][1], feature_measurements[4][1][1])
+
 	def diagnose_type_3(self, feature_measurements, diagnoses):
 		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Rotation'],
 		                                                  feature_measurements[0][0][2], feature_measurements[0][1][2])
@@ -379,14 +239,39 @@ class IPCLDiagnosis:
 		                                                  feature_measurements[4][0][4], feature_measurements[4][1][4])
 
 	@staticmethod
-	def print_results(diagnoses, normalisation_constant):
+	def vote_for_type(diagnoses):
 		if max(diagnoses.values()) == diagnoses['Type 1']:
-			print('IPCL Type 1 identified. Probability: ', diagnoses['Type 1'] / normalisation_constant * 100)
+			return 1
 		elif max(diagnoses.values()) == diagnoses['Type 2']:
-			print('IPCL Type 2 identified. Probability: ', diagnoses['Type 2'] / normalisation_constant * 100)
+			return 2
 		elif max(diagnoses.values()) == diagnoses['Type 3']:
-			print('IPCL Type 3 identified. Probability: ', diagnoses['Type 3'] / normalisation_constant * 100)
+			return 3
 		elif max(diagnoses.values()) == diagnoses['Type 4']:
-			print('IPCL Type 4 identified. Probability: ', diagnoses['Type 4'] / normalisation_constant * 100)
+			return 4
 		elif max(diagnoses.values()) == diagnoses['Type 5']:
-			print('IPCL Type 5 identified. Probability: ', diagnoses['Type 5'] / normalisation_constant * 100)
+			return 5
+
+	def normalisation_constant(self):
+		return self.diagnoses['Type 1'] + self.diagnoses['Type 2'] + self.diagnoses['Type 3'] \
+		       + self.diagnoses['Type 4'] + self.diagnoses['Type 5']
+
+	def determine_vote(self):
+		vote_1 = self.votes.count(1)
+		vote_2 = self.votes.count(2)
+		vote_3 = self.votes.count(3)
+		vote_4 = self.votes.count(4)
+		vote_5 = self.votes.count(5)
+		if vote_1 > vote_2 and vote_1 > vote_3 and vote_1 > vote_4 and vote_1 > vote_5:
+			print('\nIPCL Type 1 identified. Probability: ', self.diagnoses['Type 1'] / self.normalisation_constant() * 100)
+		elif vote_2 > vote_1 and vote_2 > vote_3 and vote_2 > vote_4 and vote_2 > vote_5:
+			print('\nIPCL Type 2 identified. Probability: ', self.diagnoses['Type 2'] / self.normalisation_constant() * 100)
+		elif vote_3 > vote_1 and vote_3 > vote_2 and vote_3 > vote_4 and vote_3 > vote_5:
+			print('\nIPCL Type 3 identified. Probability: ', self.diagnoses['Type 3'] / self.normalisation_constant() * 100)
+		elif vote_4 > vote_1 and vote_4 > vote_2 and vote_4 > vote_3 and vote_4 > vote_5:
+			print('\nIPCL Type 4 identified. Probability: ', self.diagnoses['Type 4'] / self.normalisation_constant() * 100)
+		elif vote_5 > vote_1 and vote_5 > vote_2 and vote_5 > vote_3 and vote_5 > vote_4:
+			print('\nIPCL Type 5 identified. Probability: ', self.diagnoses['Type 5'] / self.normalisation_constant() * 100)
+
+
+
+
