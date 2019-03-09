@@ -78,10 +78,10 @@ class FeatureDetector:
         ###################################################
         # Perform some morphology...
         # Perform morphological closing to get rid of holes inside the mask
-        reducedHoles = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((30, 30), np.uint8))
+        reduced_holes = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((30, 30), np.uint8))
         # Perform dilation to increase the area of the blobs a little bit
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20, 20))
-        dilated = cv2.dilate(reducedHoles, kernel, iterations=1)
+        dilated = cv2.dilate(reduced_holes, kernel, iterations=1)
 
         # Return the mask
         return dilated
@@ -177,12 +177,12 @@ class FeatureDetector:
         mask = np.ones(frame.shape[:2], dtype="uint8") * 255
         # Define the minimal area of the blobs
         # MAY BE RE-THINK MINAREA
-        minArea = 10.0
+        min_area = 10.0
         # Loop over the contours
         for c in contours:
             # In case the area of the contour is smaller than
             # the minimum area, draw it on the mask
-            if cv2.contourArea(c) > minArea:
+            if cv2.contourArea(c) > min_area:
                 cv2.drawContours(mask, [c], -1, 0, -1)
 
         filtered = cv2.subtract(thresh, mask)
@@ -257,40 +257,40 @@ class FeatureDetector:
         cv2.drawContours(img, contours, -1, 0, -1)
 
         # Crop the frame and the mask so that it has only the ROI
-        (x, y) = np.where(temp == 255)
+        x, y = np.where(temp == 255)
         if len(x) == 0 or len(y) == 0:
-            (topX, topY) = (1, 1)
-            (bottomX, bottomY) = (1, 1)
+            top_x, top_y = 1, 1
+            bottom_x, bottom_y = 1, 1
         else:
-            (topX, topY) = (np.min(x), np.min(y))
-            (bottomX, bottomY) = (np.max(x), np.max(y))
-        img = img[topX:bottomX + 1, topY:bottomY + 1]
-        mask_inverse = mask_inverse[topX:bottomX + 1, topY:bottomY + 1]
+            top_x, top_y = np.min(x), np.min(y)
+            bottom_x, bottom_y = np.max(x), np.max(y)
+        img = img[top_x:bottom_x + 1, top_y:bottom_y + 1]
+        mask_inverse = mask_inverse[top_x:bottom_x + 1, top_y:bottom_y + 1]
 
         # To illustrate the results uncomment the lines below
-        fig = plt.figure()
-        plt.subplot(231)
-        plt.imshow(frame)
-        plt.title('Original Frame')
-        plt.subplot(232)
-        plt.imshow(corners_binary)
-        plt.title('Mask Triangles In Each Corner')
-        plt.subplot(233)
-        plt.imshow(glare_binary)
-        plt.title('Mask Glare')
-        plt.subplot(234)
-        plt.imshow(subtract_mask)
-        plt.title('Subtract Mask')
-        plt.subplot(235)
-        plt.imshow(opening)
-        plt.title('Subtract Constraints & Perform Morphology')
-        plt.subplot(236)
-        plt.imshow(img)
-        plt.title('ROI')
-        plt.suptitle('Step 2. Extraction of ROI.', fontsize=16)
+        # fig = plt.figure()
+        # plt.subplot(231)
+        # plt.imshow(frame)
+        # plt.title('Original Frame')
+        # plt.subplot(232)
+        # plt.imshow(corners_binary)
+        # plt.title('Mask Triangles In Each Corner')
+        # plt.subplot(233)
+        # plt.imshow(glare_binary)
+        # plt.title('Mask Glare')
+        # plt.subplot(234)
+        # plt.imshow(subtract_mask)
+        # plt.title('Subtract Mask')
+        # plt.subplot(235)
+        # plt.imshow(opening)
+        # plt.title('Subtract Constraints & Perform Morphology')
+        # plt.subplot(236)
+        # plt.imshow(img)
+        # plt.title('ROI')
+        # plt.suptitle('Step 2. Extraction of ROI.', fontsize=16)
         # If multiple matplotlib windows are opened at the same
         # time uncomment the block=False line
-        plt.show()#(block=False)
+        # plt.show()#(block=False)
 
         # Return the ROI together with the mask that corresponds to that roi
         # and the percentage value of the roi relative to the initial frame size
@@ -335,6 +335,10 @@ class FeatureDetector:
                     mask = np.zeros(binary_roi.shape, np.uint8)
                     cv2.drawContours(mask, [c], 0, 255, -1)
 
+                    # Get the mean BGR colour of the blob
+                    blue, green, red, _ = cv2.mean(roi, mask=mask)
+                    mean_colour = (red, green, blue)
+
                     # Get the bounding rectangle around the blob, taking into
                     # account its area and rotation
                     rect = cv2.minAreaRect(c)
@@ -345,8 +349,9 @@ class FeatureDetector:
                     # Get the length of the contour
                     length = float(self.line_length(mask))
 
-                    # ['Rotation', 'Area', 'Length', 'Width', 'Height']
-                    row = [rect[2], area,  length, rect[1][0], rect[1][1]]
+                    # [['Width', 'Height', 'Rotation', 'Area', 'Colour (R,G,B)', 'Length']]
+                    row = [rect[1][0], rect[1][1], rect[2], area, mean_colour, length]
+
                     # Add that new row to the feature table
                     self.feature_table.append(row)
 
@@ -459,21 +464,19 @@ class FeatureDetector:
             print(title)
             print('---------------------------------------------------------------------------------------------')
             for row in table:
-                # Get all the columns and format them
-                # xCoor = '{:.5}'.format(row[0][0])
-                # yCoor = '{:.5}'.format(row[0][1])
-                # xyCoor = '{:^16}'.format(' (' + xCoor + ',' + yCoor + ')')
-                rotation = '{:^11.4}'.format(row[0])
-                area = '{:^6.4}'.format(row[1])
-                length = '{:^8.4}'.format(row[2])
-                width = '{:^7.4}'.format(row[3])
-                height = '{:^8.4}'.format(row[4])
-                # Print row
-                # print(xyCoor + ' | ' + width + ' | ' + height + ' | ' + rotation + ' | ' + area + ' | ' + length + ' |')
-                print(rotation + '  |  ' + area + '  |  ' + length + '  |  ' + width + '  |  ' + height + '  |')
+                width = '{:^7.4}'.format(row[1])
+                height = '{:^8.4}'.format(row[2])
+                rotation = '{:^11.4}'.format(row[3])
+                area = '{:^6.4}'.format(row[4])
+                red = '{:.5}'.format(str(row[5][0]))
+                green = '{:.5}'.format(str(row[5][1]))
+                blue = '{:.5}'.format(str(row[5][2]))
+                colour = '{:^19}'.format('(' + red + ',' + green + ',' + blue + ')')
+                length = '{:^8.4}'.format(row[6])
+                print(width + ' | ' + height + ' | ' + rotation + ' | ' + area + ' | ' + colour + ' | ' + length + ' |')
             print('---------------------------------------------------------------------------------------------')
-            # print('{:^76}'.format('TOTAL: ' + str(len(self.featureTable))))
-            print('---------------------------------------------------------------------------------------------\n')
+            print('{:^76}'.format('TOTAL: ' + str(len(table))))
+            print('--------------------------------------------------------------------------------------------- \n')
 
     ########## 14/02/2019
     def get_feature_tables(self):
@@ -496,26 +499,3 @@ class FeatureDetector:
         # Print New Line on Complete
         if iteration == total:
             print()
-
-    ########## 12/02/2019
-    def save_feature_table(self):
-        new_file = open(self.output_folder + 'feature_table.txt', 'w+')
-        title = '  Rotation  |  Area  |  Length  |  Width  |  Height  |\n'
-        for table in self.feature_tables:
-            new_file.write('-------------------------------------------------------------------------\n')
-            new_file.write(title)
-            new_file.write('-------------------------------------------------------------------------\n')
-            for row in table:
-                # Get all the columns and format them
-                # xCoor = '{:.5}'.format(row[0][0])
-                # yCoor = '{:.5}'.format(row[0][1])
-                # xyCoor = '{:^16}'.format(' (' + xCoor + ',' + yCoor + ')')
-                rotation = '{:^11.4}'.format(row[0])
-                area = '{:^6.4}'.format(row[1])
-                width = '{:^7.4}'.format(row[2])
-                height = '{:^8.4}'.format(row[3])
-                length = '{:^8.4}'.format(row[4])
-                new_file.write(rotation + ' | ' + area + ' | ' + length + ' | ' + width + ' | ' + height + '  |\n')
-            new_file.write('-------------------------------------------------------------------------\n')
-            new_file.write('\n')
-        new_file.close()
