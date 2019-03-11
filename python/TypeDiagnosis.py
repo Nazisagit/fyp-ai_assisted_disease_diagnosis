@@ -58,6 +58,7 @@ class TypeDiagnosis:
 			stds = self.calculate_stds(feature_lists)
 			modes = self.calculate_modes(feature_lists)
 			self.add_to_statistics(means, medians, stds, modes)
+			self.add_occurrences()
 			self.diagnose_by_type()
 		self.determine_vote()
 
@@ -190,6 +191,10 @@ class TypeDiagnosis:
 		mean_length = [21.058968, 19.521215, 19.195485, 20.298138, 21.058968]
 		std_length = [26.471581, 19.891479, 32.185072, 24.696921, 26.471581]
 		length = [mean_length, std_length]
+
+		mean_occurrences = []
+		std_occurrences = []
+		occurrences = [mean_occurrences, std_occurrences]
 
 		feature_measurements = [width, height, rotation, area, red, green, blue, length]
 

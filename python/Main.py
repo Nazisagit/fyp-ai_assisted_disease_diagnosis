@@ -25,22 +25,22 @@ def main():
     type4 = 'type4/'
     type5 = 'type5/'
 
-    patient_number = '0099053314d'
-    patient_date = '2017-06-12'
+    patient_number = '0015001775d'
+    patient_date = '2016-04-13'
     original_images = '../Student Data/' + patient_number + '/' + patient_date + '/'
     extracted_images = '../extracted_images/' + patient_number + '/' + patient_date + '/'
     detected_features = '../detected_features/' + patient_number + '/' + patient_date + '/'
     data_output = '../data_output/'
 
-    # extract_images(original_images, extracted_images)
-    # feature_tables = detect_features(extracted_images, detected_features)[0]
+    extract_images(original_images, extracted_images)
+    feature_tables = detect_features(extracted_images, detected_features)[0]
     number_ipcls = detect_features(extracted_images, detected_features)[1]
 
-    # data_collecting = DataCollecting(feature_tables, data_output, type1)
+    data_collecting = DataCollecting(feature_tables, number_ipcls, data_output, type4)
     # data_collecting.init_output_files()
-    # data_collecting.save_data()
+    data_collecting.save_data()
 
-    process_data(data_output, type1)
+    # process_data(data_output, type1)
 
     # type_diagnosis = TypeDiagnosis(feature_tables, number_ipcls, detected_features)
     # type_diagnosis.analyse_feature_tables()
@@ -99,6 +99,11 @@ def process_data(data_output, ipcl_type):
             print('Median length: ' + str(data_processing.calculate_median(path + file_name)))
             print('Std length: ' + str(data_processing.calculate_std(path + file_name)))
             print('Mode length: ' + str(data_processing.calculate_modes(path + file_name)))
+        elif file_name == 'occurrences.csv':
+            print('\nMean occurrences: ' + str(data_processing.calculate_mean(path + file_name)))
+            print('Median occurrences: ' + str(data_processing.calculate_median(path + file_name)))
+            print('Std occurrences: ' + str(data_processing.calculate_std(path + file_name)))
+            print('Mode occurrences: ' + str(data_processing.calculate_modes(path + file_name)))
 
 
 # Call main function

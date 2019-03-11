@@ -29,10 +29,11 @@ class DataProcessing:
 
 class DataCollecting:
 
-	def __init__(self, feature_tables, data_output, ipcl_type):
+	def __init__(self, feature_tables, number_ipcls, data_output, ipcl_type):
 		self.feature_tables = feature_tables
 		self.data_output = data_output
 		self.ipcl_type = ipcl_type
+		self.number_ipcls = number_ipcls
 
 	def init_output_files(self):
 		output = self.data_output + self.ipcl_type
@@ -44,6 +45,7 @@ class DataCollecting:
 		self.init_area_file(output)
 		self.init_colour_file(output)
 		self.init_length_file(output)
+		self.init_occurrence_file(output)
 
 	@staticmethod
 	def init_width_file(output):
@@ -87,6 +89,13 @@ class DataCollecting:
 		length_writer.writerow(['Length'])
 		length_file.close()
 
+	@staticmethod
+	def init_occurrence_file(output):
+		occurrences_file = open(output + 'occurrences.csv', 'w', newline='')
+		occurrences_writer = csv.writer(occurrences_file)
+		occurrences_writer.writerow(['Occurrences'])
+		occurrences_file.close()
+
 	def save_data(self):
 		width_list = list()
 		height_list = list()
@@ -128,6 +137,7 @@ class DataCollecting:
 			self.save_area(area_list, self.ipcl_type)
 			self.save_colour(colour_list, self.ipcl_type)
 			self.save_length(length_list, self.ipcl_type)
+		self.save_occurrences(self.number_ipcls, self.ipcl_type)
 
 	def save_width(self, width_list, ipcl_type):
 		output = self.data_output + ipcl_type
@@ -170,5 +180,12 @@ class DataCollecting:
 			length_writer = csv.writer(length_file)
 			for length in length_list:
 				length_writer.writerow([str(length)])
+
+	def save_occurrences(self, occurrences_list, ipcl_type):
+		output = self.data_output + ipcl_type
+		with open(output + 'occurrences.csv', 'a', newline='') as occurrences_file:
+			occurrences_writer = csv.writer(occurrences_file)
+			for occurrence in occurrences_list:
+				occurrences_writer.writerow([str(occurrence)])
 
 
