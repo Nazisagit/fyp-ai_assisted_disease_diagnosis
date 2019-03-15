@@ -106,18 +106,8 @@ class DataCollecting:
 
 		for table in self.feature_tables:
 			table_height = len(table)
-			# For Rotation, Area, and Length
 			for feature in [0, 1, 2, 3, 4, 5]:
-				# For all entries in the table
-				divisor = 1
-				if table_height >= 100:
-					divisor = 2
-				elif table_height >= 150:
-					divisor = 3
-				elif table_height >= 200:
-					divisor = 4
-
-				for row in range(0, table_height, divisor):
+				for row in range(0, table_height):
 					if feature == 0:
 						width_list.append(table[row][feature])
 					elif feature == 1 and table[row][feature] > 0:

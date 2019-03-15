@@ -18,33 +18,31 @@ import os
 
 # Application main method
 def main():
-    # Instantiate necessary classes:
     type1 = 'type1/'
     type2 = 'type2/'
     type3 = 'type3/'
     type4 = 'type4/'
     type5 = 'type5/'
 
-    patient_number = '0015001775d'
-    patient_date = '2016-04-13'
+    patient_number = '0014205282d'
+    patient_date = '2016-11-29'
     original_images = '../Student Data/' + patient_number + '/' + patient_date + '/'
     extracted_images = '../extracted_images/' + patient_number + '/' + patient_date + '/'
     detected_features = '../detected_features/' + patient_number + '/' + patient_date + '/'
     data_output = '../data_output/'
 
     extract_images(original_images, extracted_images)
-    feature_tables = detect_features(extracted_images, detected_features)[0]
-    number_ipcls = detect_features(extracted_images, detected_features)[1]
+    feature_tables, number_ipcls = detect_features(extracted_images, detected_features)
 
-    data_collecting = DataCollecting(feature_tables, number_ipcls, data_output, type4)
+    # data_collecting = DataCollecting(feature_tables, number_ipcls, data_output, type2)
     # data_collecting.init_output_files()
-    data_collecting.save_data()
+    # data_collecting.save_data()
 
-    # process_data(data_output, type1)
+    # process_data(data_output, type5)
 
-    # type_diagnosis = TypeDiagnosis(feature_tables, number_ipcls, detected_features)
-    # type_diagnosis.analyse_feature_tables()
-    #
+    type_diagnosis = TypeDiagnosis(feature_tables, number_ipcls, detected_features)
+    type_diagnosis.analyse_feature_tables()
+
     # group_diagnosis = GroupDiagnosis(feature_tables, number_ipcls, detected_features)
     # group_diagnosis.analyse_feature_tables()
 

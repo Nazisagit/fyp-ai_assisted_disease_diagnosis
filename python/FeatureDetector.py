@@ -19,16 +19,16 @@ import cv2
 class FeatureDetector:
 
     # Class constructor
-    ########## 12/02/2019 added output_folder
+    # 12/02/2019 added output_folder
     def __init__(self, input_folder, output_folder):
         # Define an input folder which contains the frames that has to be analysed
         self.input_folder = input_folder
-        ########## Define an output folder to save detected features
+        # Define an output folder to save detected features
         self.output_folder = output_folder
         # Define a table that will store extracted features, with structure:
         # [['(X, Y) Coordinate', 'Width', 'Height', 'Rotation', 'Area', 'Colour (R,G,B)', 'Length']]
         self.feature_table = list()
-        ########## 12/02/09
+        # 12/02/09
         self.feature_tables = list()
         # Define a list that contains number of IPCLs per each frame
         self.number_ipcls = list()
@@ -63,55 +63,21 @@ class FeatureDetector:
 
     # Finds the four triangles in each corner and mask them. Returns the
     # resulting binary image.
-    @staticmethod
-    def mask_corners(frame):
-        # Define the range of white color in HSV
-        ########## 06/02/2019
-        # lower_black = np.array([0, 0, 0])
-        # upper_black = np.array([165, 105, 20])
+    def mask_corners(self, frame):
+        # 06/02/2019
         lower_black = np.array([0, 0, 0])
-        upper_black = np.array([0, 0, 0])
+        upper_black = np.array([165, 105, 20])
 
-        # Threshold the HSV image to mark the glare parts as foreground
-        # mask = self.hsv_colour_threshold(frame, lower_black, upper_black)
-        mask = cv2.inRange(frame, lower_black, upper_black)
-        ###################################################
+        mask = self.hsv_colour_threshold(frame, lower_black, upper_black)
         # Perform some morphology...
         # Perform morphological closing to get rid of holes inside the mask
-        reduced_holes = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((30, 30), np.uint8))
+        reduced_holes = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((50, 50), np.uint8))
         # Perform dilation to increase the area of the blobs a little bit
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (20, 20))
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 30))
         dilated = cv2.dilate(reduced_holes, kernel, iterations=1)
 
         # Return the mask
         return dilated
-
-    # Finds glare regions in the frame and performs some morphology on those blobs
-    # returns a mask containing filtered glare regions
-    # def mask_glare(self, frame):
-    #     # Define the range of white color in HSV
-    #     lower_white = np.array([4, 8, 237])
-    #     upper_white = np.array([150, 102, 255])
-    #
-    #     # Threshold the HSV image to mark the glare parts as foreground
-    #     mask = self.hsv_colour_threshold(frame, lower_white, upper_white)
-    #
-    #     # Perform some morphology...
-    #     # Perform dilation to increase the area of the blobs a little bit
-    #     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (100, 100))
-    #     dilated = cv2.dilate(mask, kernel, iterations=1)
-    #     # Perform morphological closing to get rid of holes inside the mask
-    #     reducedHoles = cv2.morphologyEx(dilated, cv2.MORPH_CLOSE, np.ones((10, 10), np.uint8))
-    #     # Perform flood fill to close all holes that are left
-    #     floodFill = reducedHoles.copy()
-    #     h, w = reducedHoles.shape[:2]
-    #     temp = np.zeros((h + 2, w + 2), np.uint8)
-    #     cv2.floodFill(floodFill, temp, (0, 0), 255)
-    #     floodFillInv = cv2.bitwise_not(floodFill)
-    #     noHoles = reducedHoles | floodFillInv
-    #
-    #     # Return the result
-    #     return noHoles
 
     def mask_glare(self, frame):
         # Define the range of white color in HSV
@@ -123,7 +89,7 @@ class FeatureDetector:
 
         # Perform some morphology...
         # Perform dilation to increase the area of the blobs a little bit
-        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (50, 50))
         dilated = cv2.dilate(mask, kernel, iterations=1)
         # # Perform morphological closing to get rid of holes inside the mask
         reduced_holes = cv2.morphologyEx(dilated, cv2.MORPH_CLOSE, np.ones((10, 10), np.uint8))
@@ -227,7 +193,6 @@ class FeatureDetector:
         # Perform morphological opening to eliminate small outliers
         opening = cv2.morphologyEx(clustered, cv2.MORPH_OPEN, np.ones((10, 10), np.uint8))
 
-
         # Find the biggest blob...
         # Get the contours
         contours, _ = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -298,7 +263,7 @@ class FeatureDetector:
 
     # Counts the number of blobs in the frame, and for each
     # blob identifies it's length and colour
-    ########## 12/02/2019 Added name of file to save the detected features images
+    # 12/02/2019 Added name of file to save the detected features images
     def extract_features(self, name, frame, mask):
         # Get the current region of interest
         roi, mask, percentage_roi = self.get_roi(frame, mask)
@@ -360,7 +325,7 @@ class FeatureDetector:
                     box = np.int0(box)
                     cv2.drawContours(output, [box], 0, (0, 0, 255), 2)
 
-            ########## 12/02/09
+            # 12/02/09
             # Add tables to the set and then empty the set to separate the data between frames
             # This way we can separate the data for each image and analyse each image data separately
             self.feature_tables.append(self.feature_table)
@@ -478,7 +443,7 @@ class FeatureDetector:
             print('{:^76}'.format('TOTAL: ' + str(len(table))))
             print('--------------------------------------------------------------------------------------------- \n')
 
-    ########## 14/02/2019
+    # 14/02/2019
     def get_feature_tables(self):
         return self.feature_tables
 
@@ -493,8 +458,8 @@ class FeatureDetector:
         # The code is taken from:
         # https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
         percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
-        filledLength = int(50 * iteration // total)
-        bar = fill * filledLength + '-' * (50 - filledLength)
+        filled_length = int(50 * iteration // total)
+        bar = fill * filled_length + '-' * (50 - filled_length)
         print('\r%s |%s| %s%% %s' % ('Progress', bar, percent, 'Complete'), end='\r')
         # Print New Line on Complete
         if iteration == total:

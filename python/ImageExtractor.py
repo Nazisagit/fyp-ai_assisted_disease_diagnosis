@@ -30,29 +30,19 @@ class ImageExtractor:
 				counter += 1
 				if self.get_darkness_percent(image) < 0.3:
 					cropped_image = self.crop_frame(image)
-					# cv2.imwrite(self.output_folder + 'cropped' + str(file), cropped_image)
-					########## 01/02/2019
+					# 01/02/2019
 					# Each divided image gets saved as cropped and divided
 					divided_image = self.divide_image(cropped_image)
 					for i in range(len(divided_image)):
 						img = divided_image[i]
 						final_output = self.output_folder + str(i) + '_cropped_and_divided_' + str(file)
 						cv2.imwrite(final_output, img)
-					#######################################################################################
 
-	@staticmethod
-	def crop_frame(frame):
-		########## 03/02/2019
-		## lower_black = np.array([0, 0, 16])
-		## upper_black = np.array([165, 120, 23])
-		# I use BGR instead of HSV values because the frame
-		# does not get cropped using HSV
+	def crop_frame(self, frame):
 		lower_black = np.array([0, 0, 0])
 		upper_black = np.array([0, 0, 0])
 		# Threshold the HSV image to mark all black regions as foreground
-		## mask = self.hsv_colour_threshold(frame, lower_value=lower_black, upper_value=upper_black)
-		mask = cv2.inRange(frame, lower_black, upper_black)
-		###################################################
+		mask = self.hsv_colour_threshold(frame, lower_value=lower_black, upper_value=upper_black)
 		# Perform morphological closing to eliminate small objects like text and icons
 		mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((100, 100), np.uint8))
 
@@ -90,8 +80,9 @@ class ImageExtractor:
 		lower_dark = np.array([0, 0, 30])
 		upper_dark = np.array([30, 55, 37])
 
-		# Threshold the HSV image to mark the glare parts as foreground
 		mask = self.hsv_colour_threshold(frame, lower_value=lower_dark, upper_value=upper_dark)
+		# 12/03/2019
+		# mask = cv2.inRange(frame, lower_dark, upper_dark)
 
 		# Calculate frame darkness percentage
 		height, width, channels = frame.shape
@@ -124,7 +115,7 @@ class ImageExtractor:
 		if iteration == total:
 			print()
 
-	########## 01/02/2019
+	# 01/02/2019
 	# Divides the image into 4 images
 	@staticmethod
 	def divide_image(frame):
@@ -140,4 +131,3 @@ class ImageExtractor:
 				if blockcol > 1 and blockrow > 1:
 					divided_images.append(block)
 		return divided_images
-	#########################
