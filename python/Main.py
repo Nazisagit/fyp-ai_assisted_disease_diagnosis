@@ -24,8 +24,8 @@ def main():
     type4 = 'type4/'
     type5 = 'type5/'
 
-    patient_number = '0014205282d'
-    patient_date = '2016-11-29'
+    patient_number = '0010092102d'
+    patient_date = '2017-12-08'
     original_images = '../Student Data/' + patient_number + '/' + patient_date + '/'
     extracted_images = '../extracted_images/' + patient_number + '/' + patient_date + '/'
     detected_features = '../detected_features/' + patient_number + '/' + patient_date + '/'
