@@ -32,15 +32,17 @@ class ImageExtractor:
 					cropped_image = self.crop_frame(image)
 					# 01/02/2019
 					# Each divided image gets saved as cropped and divided
-					divided_image = self.divide_image(cropped_image)
-					for i in range(len(divided_image)):
-						img = divided_image[i]
-						final_output = self.output_folder + str(i) + '_cropped_and_divided_' + str(file)
-						cv2.imwrite(final_output, img)
+					# divided_image = self.divide_image(cropped_image)
+					# for i in range(len(divided_image)):
+					# 	img = divided_image[i]
+					# 	final_output = self.output_folder + str(i) + '_cropped_and_divided_' + str(file)
+					# 	cv2.imwrite(final_output, img)
+					final_output = self.output_folder + '_cropped_and_divided_' + str(file)
+					cv2.imwrite(final_output, cropped_image)
 
 	def crop_frame(self, frame):
-		lower_black = np.array([0, 0, 0])
-		upper_black = np.array([0, 0, 0])
+		lower_black = np.array([0, 0, 16])
+		upper_black = np.array([165, 120, 23])
 		# Threshold the HSV image to mark all black regions as foreground
 		mask = self.hsv_colour_threshold(frame, lower_value=lower_black, upper_value=upper_black)
 		# Perform morphological closing to eliminate small objects like text and icons
@@ -76,7 +78,6 @@ class ImageExtractor:
 	# Identifies the percentage of the frame that is very dark.
 	# Used to make sure no dark frames are saved to disk.
 	def get_darkness_percent(self, frame):
-		# Define the range of white color in HSV
 		lower_dark = np.array([0, 0, 30])
 		upper_dark = np.array([30, 55, 37])
 

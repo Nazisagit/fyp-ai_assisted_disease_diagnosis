@@ -65,7 +65,6 @@ class TypeDiagnosis:
 			self.add_to_statistics(means, medians, stds, modes)
 			self.add_occurrences()
 			self.diagnose_by_type()
-		# self.determine_vote()
 		self.determine_type()
 
 	@staticmethod
@@ -169,34 +168,53 @@ class TypeDiagnosis:
 	def diagnose_by_type(self):
 		# [Type 1, Type 2, Type 3, Type 4, Type 5]
 		# Width
+		# All samples
 		# mean_width = [9.150127, 8.635681, 8.262123, 8.880439, 9.003234]
 		# std_width = [18.114578, 10.766246, 11.912546, 17.903905, 14.529328]
+		# 240k samples
 		mean_width = [9.157767, 8.885544, 8.266334, 8.866753, 8.851637]
 		std_width = [18.184773, 11.249954, 11.923453, 17.541444, 14.102458]
+		# 20% samples
+		# mean_width = [8.689623, 8.825699, 8.431116, 8.860954, 8.961676]
+		# std_width = [15.832091, 11.070366, 12.841295, 17.536271, 14.241984]
 		width = [mean_width, std_width]
 
 		# Height
+		# All samples
 		# mean_height = [8.171219, 8.302546, 8.113451, 8.056456, 8.000869]
 		# std_height = [10.439326, 8.089224, 7.159418, 7.469403, 8.382132]
+		# 240k samples
 		mean_height = [8.175608, 8.438701, 8.114553, 8.004633, 7.962122]
 		std_height = [10.44579, 8.487933, 7.135055, 7.519646, 8.534472]
+		# 20% samples
+		# mean_height = [8.252257, 8.467586, 8.075156, 7.998053, 8.030263]
+		# std_height = [10.163706, 8.359741, 7.141456, 7.648411, 8.386695]
 		height = [mean_height, std_height]
 
-		# # Rotation
+		# Rotation
+		# All samples
 		# mean_rotation = [90.0, 87.078689, 90.0, 89.478681, 87.755775]
 		# std_rotation = [0.01, 11.09079, 0.01, 4.815404, 9.795837]
+		# 240k samples
 		mean_rotation = [90.0, 87.6, 90.0, 89.55, 87.6]
 		std_rotation = [0.0, 10.128274, 0.0, 4.484925, 10.128274]
-		rotation = [mean_rotation, std_rotation]
+		# 20% samples
+		# rotation = [mean_rotation, std_rotation]
 
 		# Area
+		# All samples
 		# mean_area = [18.033632, 24.1761, 21.788223, 20.445338, 24.093709]
 		# std_area = [19.213505, 27.009009, 20.448601, 22.584755, 30.801586]
+		# 240k samples
 		mean_area = [18.028396, 24.027873, 21.763898, 20.448377, 24.210444]
 		std_area = [19.22715, 24.919726, 20.427965, 23.358861, 30.780212]
+		# 20% samples
+		# mean_area = [18.377655, 23.982702, 21.16826, 19.735166, 23.830924]
+		# std_area = [19.173217, 24.946596, 19.726369, 20.072329, 30.412831]
 		area = [mean_area, std_area]
 
 		# Colour
+		# All samples
 		# red = [(109.973664, 33.833426), (86.156104, 33.698000),
 		#        (111.147070, 26.217299), (111.496416, 28.218792),
 		#        (96.131059, 30.058415)]
@@ -206,30 +224,52 @@ class TypeDiagnosis:
 		# blue = [(78.433364, 27.482859), (69.321456, 25.324556),
 		#         (78.627009, 23.472018), (83.179267, 24.462849),
 		#         (74.991972, 28.361276)]
+		# 240k samples
 		red = [(109.917878, 33.957523), (87.656928, 34.113082),
 		       (111.188577, 26.235706), (112.908580, 28.623788),
 		       (94.329682, 30.346502)]
 		green = [(98.955726, 31.532790), (90.389690, 30.326891),
 		         (100.144062, 26.889236), (105.805799, 27.140504),
-		         (94.026939, 31.739895)]
+		         (94.329682, 30.346502)]
 		blue = [(77.953560, 27.305447), (70.503467, 25.989698),
 		        (78.658916, 23.496624), (83.865679, 24.155162),
 		        (73.678371, 27.756969)]
+		# 20% samples
+		# red = [(106.569437, 33.543879), (91.366620, 33.949612),
+		#        (111.886456, 26.098948), (109.165500, 29.484160),
+		#        (95.009487, 30.111865)]
+		# green = [(98.418138, 31.548281), (91.401215, 29.808052),
+		#          (98.547211, 27.287176), (103.226638, 27.839342),
+		#          (95.042572, 32.266208)]
+		# blue = [(77.473731, 27.363583), (71.255571, 25.678357),
+		#         (77.292524, 23.749699), (81.598640, 24.641982),
+		#         (74.605212, 28.221014)]
 
 		# Length
+		# All samples
 		# mean_length = [20.940169, 18.949608, 18.463331, 20.057924, 20.098817]
 		# std_length = [23.902838, 17.637065, 16.979052, 22.710487, 22.320908]
+		# 240k samples
 		mean_length = [20.988338, 19.445307, 18.477696, 19.995304, 19.781513]
 		std_length = [23.998898, 18.988866, 16.989422, 22.740876, 21.430037]
+		# 20% samples
+		# mean_length = [19.933122, 19.411383, 18.647191, 20.103583, 20.171453]
+		# std_length = [21.614909, 18.519772, 17.55617, 22.745417, 22.417837]
 		length = [mean_length, std_length]
 
+		# Occurrences
+		# All samples
 		# mean_occurrences = [68.55, 81.356667, 52.086957, 148.2185, 102.851537]
 		# std_occurrences = [44.753413, 52.718183, 51.079398, 146.474588, 104.646254]
+		# 240k samples
 		mean_occurrences = [68.55, 88.371429, 44.185714, 160.207143, 114.535714]
 		std_occurrences = [44.753413, 53.709228, 48.543622, 147.751225, 113.811115]
+		# 20% samples
+		# mean_occurrences = [68.0, 80.566667, 63.785714, 123.962185, 93.274476]
+		# std_occurrences = [44.665837, 52.741894, 51.95964, 132.057695, 83.574625]
 		occurrences = [mean_occurrences, std_occurrences]
 
-		feature_measurements = [width, height, rotation, area, red, green, blue, length, occurrences]
+		feature_measurements = [width, height, area, red, green, blue, length, occurrences]
 
 		self.init_diagnoses_type()
 		self.diagnose_type_1(feature_measurements, self.diagnoses)
@@ -247,122 +287,98 @@ class TypeDiagnosis:
 		self.diagnoses['Type 5'] = 1
 
 	def diagnose_type_1(self, feature_measurements, diagnoses):
-		# diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Width'],
-		#                                                   feature_measurements[0][0][0], feature_measurements[0][1][0])
-		# diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Height'],
-		#                                                   feature_measurements[1][0][0], feature_measurements[1][1][0])
-		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Area'],
-		                                                  feature_measurements[3][0][0], feature_measurements[3][1][0])
-		# diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
-		#                                                   feature_measurements[4][0][0], feature_measurements[4][0][1])
+		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Width'],
+		                                                  feature_measurements[0][0][0], feature_measurements[0][1][0])
+		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Height'],
+		                                                  feature_measurements[1][0][0], feature_measurements[1][1][0])
+		# diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Area'],
+		#                                                   feature_measurements[2][0][0], feature_measurements[2][1][0])
+		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
+		                                                  feature_measurements[3][0][0], feature_measurements[3][0][1])
 		# diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Colour'][1],
-		#                                                   feature_measurements[5][0][0], feature_measurements[5][0][1])
-		# diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
-		#                                                   feature_measurements[6][0][0], feature_measurements[6][0][1])
+		#                                                   feature_measurements[4][0][0], feature_measurements[4][0][1])
+		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
+		                                                  feature_measurements[5][0][0], feature_measurements[5][0][1])
 		# diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Length'],
-		#                                                   feature_measurements[7][0][0], feature_measurements[7][1][0])
+		#                                                   feature_measurements[6][0][0], feature_measurements[6][1][0])
 		diagnoses['Type 1'] *= self.calculate_probability(self.statistics['Mean Occurrences'],
-		                                                  feature_measurements[8][0][0], feature_measurements[8][1][0])
+		                                                  feature_measurements[7][0][0], feature_measurements[7][1][0])
 
 	def diagnose_type_2(self, feature_measurements, diagnoses):
-		# diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Width'],
-		#                                                   feature_measurements[0][0][1], feature_measurements[0][1][1])
-		# diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Height'],
-		#                                                   feature_measurements[1][0][1], feature_measurements[1][1][1])
-		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Area'],
-		                                                  feature_measurements[3][0][1], feature_measurements[3][1][1])
-		# diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
-		#                                                   feature_measurements[4][1][0], feature_measurements[4][1][1])
+		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Width'],
+		                                                  feature_measurements[0][0][1], feature_measurements[0][1][1])
+		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Height'],
+		                                                  feature_measurements[1][0][1], feature_measurements[1][1][1])
+		# diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Area'],
+		#                                                   feature_measurements[2][0][1], feature_measurements[2][1][1])
+		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
+		                                                  feature_measurements[3][1][0], feature_measurements[3][1][1])
 		# diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Colour'][1],
-		#                                                   feature_measurements[5][1][0], feature_measurements[5][1][1])
-		# diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
-		#                                                   feature_measurements[6][1][0], feature_measurements[6][1][1])
+		#                                                   feature_measurements[4][1][0], feature_measurements[4][1][1])
+		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
+		                                                  feature_measurements[5][1][0], feature_measurements[5][1][1])
 		# diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Length'],
-		#                                                   feature_measurements[7][0][1], feature_measurements[7][1][1])
+		#                                                   feature_measurements[6][0][1], feature_measurements[6][1][1])
 		diagnoses['Type 2'] *= self.calculate_probability(self.statistics['Mean Occurrences'],
-		                                                  feature_measurements[8][0][1], feature_measurements[8][1][1])
+		                                                  feature_measurements[7][0][1], feature_measurements[7][1][1])
 
 	def diagnose_type_3(self, feature_measurements, diagnoses):
-		# diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Width'],
-		#                                                   feature_measurements[0][0][2], feature_measurements[0][1][2])
-		# diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Height'],
-		#                                                   feature_measurements[1][0][2], feature_measurements[1][1][2])
-		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Area'],
-		                                                  feature_measurements[3][0][2], feature_measurements[3][1][2])
-		# diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
-		#                                                   feature_measurements[4][2][0], feature_measurements[4][2][1])
+		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Width'],
+		                                                  feature_measurements[0][0][2], feature_measurements[0][1][2])
+		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Height'],
+		                                                  feature_measurements[1][0][2], feature_measurements[1][1][2])
+		# diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Area'],
+		#                                                   feature_measurements[2][0][2], feature_measurements[2][1][2])
+		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
+		                                                  feature_measurements[3][2][0], feature_measurements[3][2][1])
 		# diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Colour'][1],
-		#                                                   feature_measurements[5][2][0], feature_measurements[5][2][1])
-		# diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
-		#                                                   feature_measurements[6][2][0], feature_measurements[6][2][1])
+		#                                                   feature_measurements[4][2][0], feature_measurements[4][2][1])
+		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
+		                                                  feature_measurements[5][2][0], feature_measurements[5][2][1])
 		# diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Length'],
-		#                                                   feature_measurements[7][0][2], feature_measurements[7][1][2])
+		#                                                   feature_measurements[6][0][2], feature_measurements[6][1][2])
 		diagnoses['Type 3'] *= self.calculate_probability(self.statistics['Mean Occurrences'],
-		                                                  feature_measurements[8][0][2], feature_measurements[8][1][2])
+		                                                  feature_measurements[7][0][2], feature_measurements[7][1][2])
 
 	def diagnose_type_4(self, feature_measurements, diagnoses):
 		diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Width'],
 		                                                  feature_measurements[0][0][3], feature_measurements[0][1][3])
-		# diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Height'],
-		#                                                   feature_measurements[1][0][3], feature_measurements[1][1][3])
-		diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Area'],
-		                                                  feature_measurements[3][0][3], feature_measurements[3][1][3])
-		# diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
-		#                                                   feature_measurements[4][3][0], feature_measurements[4][3][1])
+		diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Height'],
+		                                                  feature_measurements[1][0][3], feature_measurements[1][1][3])
+		# diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Area'],
+		#                                                   feature_measurements[2][0][3], feature_measurements[2][1][3])
+		diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
+		                                                  feature_measurements[3][3][0], feature_measurements[3][3][1])
 		# diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Colour'][1],
-		#                                                   feature_measurements[5][3][0], feature_measurements[5][3][1])
-		# diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
-		#                                                   feature_measurements[6][3][0], feature_measurements[6][3][1])
+		#                                                   feature_measurements[4][3][0], feature_measurements[4][3][1])
+		diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
+		                                                  feature_measurements[5][3][0], feature_measurements[5][3][1])
 		# diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Length'],
-		#                                                   feature_measurements[7][0][3], feature_measurements[7][1][3])
+		#                                                   feature_measurements[6][0][3], feature_measurements[6][1][3])
 		diagnoses['Type 4'] *= self.calculate_probability(self.statistics['Mean Occurrences'],
-		                                                  feature_measurements[8][0][3], feature_measurements[8][1][3])
+		                                                  feature_measurements[7][0][3], feature_measurements[7][1][3])
 
 	def diagnose_type_5(self, feature_measurements, diagnoses):
 		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Width'],
 		                                                  feature_measurements[0][0][4], feature_measurements[0][1][4])
-		# diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Height'],
-		#                                                   feature_measurements[1][0][4], feature_measurements[1][1][4])
-		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Area'],
-		                                                  feature_measurements[3][0][4], feature_measurements[3][1][4])
-		# diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
-		#                                                   feature_measurements[4][4][0], feature_measurements[4][4][1])
+		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Height'],
+		                                                  feature_measurements[1][0][4], feature_measurements[1][1][4])
+		# diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Area'],
+		#                                                   feature_measurements[2][0][4], feature_measurements[2][1][4])
+		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
+		                                                  feature_measurements[3][4][0], feature_measurements[3][4][1])
 		# diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Colour'][1],
-		#                                                   feature_measurements[5][4][0], feature_measurements[5][4][1])
-		# diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
-		#                                                   feature_measurements[6][4][0], feature_measurements[6][4][1])
+		#                                                   feature_measurements[4][4][0], feature_measurements[4][4][1])
+		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
+		                                                  feature_measurements[5][4][0], feature_measurements[5][4][1])
 		# diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Length'],
-		#                                                   feature_measurements[7][0][4], feature_measurements[7][1][4])
+		#                                                   feature_measurements[6][0][4], feature_measurements[6][1][4])
 		diagnoses['Type 5'] *= self.calculate_probability(self.statistics['Mean Occurrences'],
-		                                                  feature_measurements[8][0][4], feature_measurements[8][1][4])
-
-	# def vote_for_type(self, diagnoses):
-	# 	if max(diagnoses.values()) == diagnoses['Type 1']:
-	# 		self.one += 1
-	# 	elif max(diagnoses.values()) == diagnoses['Type 2']:
-	# 		self.two += 1
-	# 	elif max(diagnoses.values()) == diagnoses['Type 3']:
-	# 		self.three += 1
-	# 	elif max(diagnoses.values()) == diagnoses['Type 4']:
-	# 		self.four += 1
-	# 	elif max(diagnoses.values()) == diagnoses['Type 5']:
-	# 		self.five += 1
+		                                                  feature_measurements[7][0][4], feature_measurements[7][1][4])
 
 	def normalisation_constant(self):
 		return self.diagnoses['Type 1'] + self.diagnoses['Type 2'] + self.diagnoses['Type 3'] \
 		       + self.diagnoses['Type 4'] + self.diagnoses['Type 5']
-
-	# def determine_vote(self):
-	# 	if np.argmax(self.votes) == 0:
-	# 		print('\nType 1 IPCL. Probability:', self.diagnoses['Type 1'] / self.normalisation_constant() * 100)
-	# 	elif np.argmax(self.votes) == 1:
-	# 		print('\nType 2 IPCL. Probability:', self.diagnoses['Type 2'] / self.normalisation_constant() * 100)
-	# 	elif np.argmax(self.votes) == 2:
-	# 		print('\nType 3 IPCL. Probability:', self.diagnoses['Type 3'] / self.normalisation_constant() * 100)
-	# 	elif np.argmax(self.votes) == 3:
-	# 		print('\nType 4 IPCL. Probability:', self.diagnoses['Type 4'] / self.normalisation_constant() * 100)
-	# 	elif np.argmax(self.votes) == 4:
-	# 		print('\nType 5 IPCL. Probability:', self.diagnoses['Type 5'] / self.normalisation_constant() * 100)#
 
 	def determine_type(self):
 		if max(self.diagnoses.values()) == self.diagnoses['Type 1']:

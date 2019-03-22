@@ -7,6 +7,7 @@
 # Import necessary classes:
 from python.TypeDiagnosis import TypeDiagnosis
 from python.GroupDiagnosis import GroupDiagnosis
+from python.Diagnosis import Diagnosis
 from python.ImageExtractor import ImageExtractor
 from python.FeatureDetector import FeatureDetector
 from processing.DataProcessing import DataProcessing, DataCollecting
@@ -23,9 +24,12 @@ def main():
     type3 = 'type3/'
     type4 = 'type4/'
     type5 = 'type5/'
+    group1 = 'group1/'
+    group2 = 'group2/'
+    group3 = 'group3/'
 
-    patient_number = '0010092102d'
-    patient_date = '2017-12-08'
+    patient_number = '0097000612d'
+    patient_date = '2017-01-14'
     original_images = '../Student Data/' + patient_number + '/' + patient_date + '/'
     extracted_images = '../extracted_images/' + patient_number + '/' + patient_date + '/'
     detected_features = '../detected_features/' + patient_number + '/' + patient_date + '/'
@@ -34,14 +38,18 @@ def main():
     extract_images(original_images, extracted_images)
     feature_tables, number_ipcls = detect_features(extracted_images, detected_features)
 
-    # data_collecting = DataCollecting(feature_tables, number_ipcls, data_output, type2)
+    # data_collecting = DataCollecting(feature_tables, number_ipcls, data_output, group2)
     # data_collecting.init_output_files()
     # data_collecting.save_data()
 
-    # process_data(data_output, type5)
+    # process_data(data_output, group1)
 
-    type_diagnosis = TypeDiagnosis(feature_tables, number_ipcls, detected_features)
-    type_diagnosis.analyse_feature_tables()
+    diagnosis = Diagnosis(feature_tables, number_ipcls, detected_features)
+    diagnosis.analyse_feature_tables()
+    diagnosis.svm(100000)
+
+    # type_diagnosis = TypeDiagnosis(feature_tables, number_ipcls, detected_features)
+    # type_diagnosis.analyse_feature_tables()
 
     # group_diagnosis = GroupDiagnosis(feature_tables, number_ipcls, detected_features)
     # group_diagnosis.analyse_feature_tables()
@@ -50,7 +58,6 @@ def main():
 def extract_images(original_images, extracted_images):
     if not os.path.exists(extracted_images):
         os.makedirs(extracted_images)
-    #
     image_extractor = ImageExtractor(original_images, extracted_images)
     image_extractor.extract()
 
@@ -77,11 +84,6 @@ def process_data(data_output, ipcl_type):
             print('Median height: ' + str(data_processing.calculate_median(path + file_name)))
             print('Std height: ' + str(data_processing.calculate_std(path + file_name)))
             print('Mode height: ' + str(data_processing.calculate_modes(path + file_name)))
-        elif file_name == 'rotation.csv':
-            print('\nMean rotation: ' + str(data_processing.calculate_mean(path + file_name)))
-            print('Median rotation: ' + str(data_processing.calculate_median(path + file_name)))
-            print('Std rotation: ' + str(data_processing.calculate_std(path + file_name)))
-            print('Mode rotation: ' + str(data_processing.calculate_modes(path + file_name)))
         elif file_name == 'area.csv':
             print('\nMean area: ' + str(data_processing.calculate_mean(path + file_name)))
             print('Median area: ' + str(data_processing.calculate_median(path + file_name)))

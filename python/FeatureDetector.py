@@ -314,8 +314,8 @@ class FeatureDetector:
                     # Get the length of the contour
                     length = float(self.line_length(mask))
 
-                    # [['Width', 'Height', 'Rotation', 'Area', 'Colour (R,G,B)', 'Length']]
-                    row = [rect[1][0], rect[1][1], rect[2], area, mean_colour, length]
+                    # [['Width', 'Height', 'Area', 'Colour (R,G,B)', 'Length']]
+                    row = [rect[1][0], rect[1][1], area, mean_colour, length]
 
                     # Add that new row to the feature table
                     self.feature_table.append(row)
@@ -343,18 +343,18 @@ class FeatureDetector:
             cv2.imwrite(self.output_folder + '_final_output_' + name, output)
 
             # To illustrate the results uncomment the lines below
-            # fig = plt.figure()
-            # plt.subplot(131)
-            # plt.imshow(frame)
-            # plt.title('Original')
-            # plt.subplot(132)
-            # plt.imshow(roi)
-            # plt.title('ROI')
-            # plt.subplot(133)
-            # plt.imshow(output)
-            # plt.title('Extracted Features')
-            # plt.suptitle('Step 4. Extracting Features From Blobs.', fontsize=16)
-            # plt.show()
+            fig = plt.figure()
+            plt.subplot(131)
+            plt.imshow(frame)
+            plt.title('Original')
+            plt.subplot(132)
+            plt.imshow(roi)
+            plt.title('ROI')
+            plt.subplot(133)
+            plt.imshow(output)
+            plt.title('Extracted Features')
+            plt.suptitle('Step 4. Extracting Features From Blobs.', fontsize=16)
+            plt.show()
 
     # Checks if detected IPCL is actually the glare, i.e. if some
     # small glare region was not excluded by glare detection software.
@@ -422,7 +422,7 @@ class FeatureDetector:
     # Prints the current state of the feature table
     def print_feature_table(self):
         # Create and print title
-        title = '  Rotation  |  Area  |  Length  |  Width  |  Height  |'
+        title = '  Width  | Height  |  Area  |  Colour  |  Length  |'
         # For each row of the table
         for table in self.feature_tables:
             print('\n---------------------------------------------------------------------------------------------')
@@ -431,14 +431,13 @@ class FeatureDetector:
             for row in table:
                 width = '{:^7.4}'.format(row[1])
                 height = '{:^8.4}'.format(row[2])
-                rotation = '{:^11.4}'.format(row[3])
-                area = '{:^6.4}'.format(row[4])
-                red = '{:.5}'.format(str(row[5][0]))
-                green = '{:.5}'.format(str(row[5][1]))
-                blue = '{:.5}'.format(str(row[5][2]))
+                area = '{:^6.4}'.format(row[3])
+                red = '{:.5}'.format(str(row[4][0]))
+                green = '{:.5}'.format(str(row[4][1]))
+                blue = '{:.5}'.format(str(row[4][2]))
                 colour = '{:^19}'.format('(' + red + ',' + green + ',' + blue + ')')
-                length = '{:^8.4}'.format(row[6])
-                print(width + ' | ' + height + ' | ' + rotation + ' | ' + area + ' | ' + colour + ' | ' + length + ' |')
+                length = '{:^8.4}'.format(row[5])
+                print(width + ' | ' + height + ' | ' + area + ' | ' + colour + ' | ' + length + ' |')
             print('---------------------------------------------------------------------------------------------')
             print('{:^76}'.format('TOTAL: ' + str(len(table))))
             print('--------------------------------------------------------------------------------------------- \n')

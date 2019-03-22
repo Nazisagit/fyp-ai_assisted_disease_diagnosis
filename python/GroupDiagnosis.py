@@ -16,12 +16,10 @@ class GroupDiagnosis:
 		self.statistical_diagnoses_output = statistical_diagnoses_output
 		self.diagnoses = dict()
 		self.statistics = dict()
-		self.votes = [0, 0, 0]
 
 	def analyse_feature_tables(self):
 		width_list = list()
 		height_list = list()
-		rotation_list = list()
 		area_list = list()
 		red_list = list()
 		blue_list = list()
@@ -31,24 +29,22 @@ class GroupDiagnosis:
 
 		for table in self.feature_tables:
 			table_height = len(table)
-			for feature in [0, 1, 2, 3, 4, 5]:
+			for feature in [0, 1, 2, 3, 4]:
 				for row in range(0, table_height):
 					if feature == 0:
 						width_list.append(table[row][feature])
 					elif feature == 1:
 						height_list.append(table[row][feature])
 					elif feature == 2:
-						rotation_list.append(table[row][feature])
-					elif feature == 3:
 						area_list.append(table[row][feature])
-					elif feature == 4:
+					elif feature == 3:
 						red_list.append(table[row][feature][0])
 						blue_list.append(table[row][feature][1])
 						green_list.append(table[row][feature][2])
-					elif feature == 5:
+					elif feature == 4:
 						length_list.append(table[row][feature])
 
-			self.append_feature_vectors(feature_lists, width_list, height_list, rotation_list,
+			self.append_feature_vectors(feature_lists, width_list, height_list,
 			                            area_list, red_list, green_list, blue_list, length_list)
 			means = self.calculate_means(feature_lists)
 			medians = self.calculate_medians(feature_lists)
@@ -57,14 +53,12 @@ class GroupDiagnosis:
 			self.add_to_statistics(means, medians, stds, modes)
 			self.add_occurrences()
 			self.diagnose_by_group()
-		# self.determine_vote()
 		self.determine_group()
 
 	@staticmethod
-	def append_feature_vectors(features, width, height, rotation, area, red, green, blue, length):
+	def append_feature_vectors(features, width, height, area, red, green, blue, length):
 		features.append(width)
 		features.append(height)
-		features.append(rotation)
 		features.append(area)
 		features.append(red)
 		features.append(green)
@@ -163,88 +157,85 @@ class GroupDiagnosis:
 		self.diagnoses['Group 2'] = 1
 		self.diagnoses['Group 3'] = 1
 
-	# def diagnose_by_group(self):
-	# 	# [Group 1, Group 2, Group 3]
-	# 	# Width
-	# 	mean_width = [9.150127, 8.262123, 9.003234]
-	# 	std_width = [18.114578, 11.912546, 14.529328]
-	# 	width = [mean_width, std_width]
-	#
-	# 	# Height
-	# 	mean_height = [8.171219, 8.113451, 8.000869]
-	# 	std_height = [10.439326, 7.159418, 8.382132]
-	# 	height = [mean_height, std_height]
-	#
-	# 	# Rotation
-	# 	mean_rotation = [90.0, 90.0, 87.755775]
-	# 	std_rotation = [0.01, 0.01, 9.795837]
-	# 	rotation = [mean_rotation, std_rotation]
-	#
-	# 	# Area
-	# 	mean_area = [18.033632, 21.788223, 24.093709]
-	# 	std_area = [19.213505, 20.448601, 30.801586]
-	# 	area = [mean_area, std_area]
-	#
-	# 	# Colour
-	# 	red = [(109.973664, 33.833426), (111.147070, 26.217299), (96.131059, 30.058415)]
-	# 	green = [(99.486546, 31.702755), (100.108983, 26.862058), (95.463959, 32.361538)]
-	# 	blue = [(78.433364, 27.482859), (78.627009, 23.472018), (74.991972, 28.361276)]
-	#
-	# 	# Length
-	# 	mean_length = [20.940169, 18.463331, 20.098817]
-	# 	std_length = [23.902838, 16.979052, 22.320908]
-	# 	length = [mean_length, std_length]
-	#
-	# 	# Occurrences
-	# 	mean_occurrences = [68.55, 52.086957, 102.851537]
-	# 	std_occurrences = [44.753413, 51.079398, 104.646254]
-	# 	occurrences = [mean_occurrences, std_occurrences]
-	#
-	# 	feature_measurements = [width, height, rotation, area, red, green, blue, length, occurrences]
-	# 	self.init_diagnoses_group()
-	# 	self.diagnose_group_1(feature_measurements, self.diagnoses)
-	# 	self.diagnose_group_2(feature_measurements, self.diagnoses)
-	# 	self.diagnose_group_3(feature_measurements, self.diagnoses)
-		# self.vote_for_group()
-
 	def diagnose_by_group(self):
 		# [Group 1, Group 2, Group 3]
 		# Width
-		mean_width = [9.150127, 8.262123, 9.003234]
-		std_width = [18.114578, 11.912546, 14.529328]
+		# 75% sample
+		mean_width = [8.197891]
+		std_width = [7.964949]
+		# 240k samples
+		# mean_width = [9.021655, 8.566543, 8.851637]
+		# std_width = [15.120905, 15.000839, 14.102458]
+		# 20% samples
+		# mean_width = [8.799076, 8.85634, 8.961676]
+		# std_width = [12.149808, 17.492623, 14.241984]
 		width = [mean_width, std_width]
 
 		# Height
-		mean_height = [8.171219, 8.113451, 8.000869]
-		std_height = [10.439326, 7.159418, 8.382132]
+		# 75% samples
+		mean_height = [9.940834]
+		std_height = [9.940834]
+		# 240k samples
+		# mean_height = [8.307154, 8.059593, 7.962122]
+		# std_height = [9.51824, 7.330072, 8.534472]
+		# height = [mean_height, std_height]
+		# 20% samples
+		# mean_height = [8.425792, 7.999119, 8.030263]
+		# std_height = [8.739446, 7.641639, 8.386695]
 		height = [mean_height, std_height]
 
-		# Rotation
-		mean_rotation = [90.0, 90.0, 87.755775]
-		std_rotation = [0.01, 0.01, 9.795837]
-		rotation = [mean_rotation, std_rotation]
-
 		# Area
-		mean_area = [18.033632, 21.788223, 24.093709]
-		std_area = [19.213505, 20.448601, 30.801586]
+		# 75% samples
+		mean_area = [27.976652]
+		std_area = [69.162132]
+		# 240k samples
+		# mean_area = [21.028134, 21.106137, 24.210444]
+		# std_area = [22.457414, 21.952237, 30.780212]
+		# 20% samples
+		# mean_area = [22.89487, 19.786446, 23.830924]
+		# std_area = [24.03765, 20.068357, 30.412831]
 		area = [mean_area, std_area]
 
 		# Colour
-		red = [(109.973664, 33.833426), (111.147070, 26.217299), (96.131059, 30.058415)]
-		green = [(99.486546, 31.702755), (100.108983, 26.862058), (95.463959, 32.361538)]
-		blue = [(78.433364, 27.482859), (78.627009, 23.472018), (74.991972, 28.361276)]
+		red = [(105.344278, 22.255299)]
+		green = [(106.249847, 22.344215)]
+		blue = [(84.181842, 19.954252)]
+		# 240k samples
+		# red = [(98.787334, 35.809122), (112.048579, 27.469161), (94.329682, 30.346502)]
+		# green = [(94.672681, 31.230764), (102.974930, 27.163051), (94.329682, 30.346502)]
+		# blue = [(74.228490, 26.914684), (81.262298, 23.969940), (73.678371, 27.756969)]
+		# 20% samples
+		# red = [(94.341010, 34.403288), (109.200473, 29.444711), (95.009487, 30.111865)]
+		# green = [(92.774057, 30.284560), (103.166494, 27.837301), (95.042572, 32.266208)]
+		# blue = [(72.472137, 26.133280), (81.543294, 24.635490), (74.605212, 28.221014)]
 
 		# Length
-		mean_length = [20.940169, 18.463331, 20.098817]
-		std_length = [23.902838, 16.979052, 22.320908]
+		# 75% samples
+		mean_length = [22.260356]
+		std_length = [34.068365]
+		# 240k samples
+		# mean_length = [20.216815, 19.2365, 19.781513]
+		# std_length = [21.653142, 20.086535, 21.430037]
+		# length = [mean_length, std_length]
+		# 20% samples
+		# mean_length = [19.51346, 20.084864, 20.171453]
+		# std_length = [19.165771, 22.686842, 22.417837]
 		length = [mean_length, std_length]
 
 		# Occurrences
-		mean_occurrences = [68.55, 52.086957, 102.851537]
-		std_occurrences = [44.753413, 51.079398, 104.646254]
+		# 75% samples
+		mean_occurrences = [140.05]
+		std_occurrences = [79.76378]
+		# 240k samples
+		# mean_occurrences = [78.460714, 102.196429, 114.535714]
+		# std_occurrences = [50.334778, 124.207137, 113.811115]
+		# occurrences = [mean_occurrences, std_occurrences]
+		# 20% samples
+		# mean_occurrences = [76.568182, 117.62782, 93.274476]
+		# std_occurrences = [50.400875, 127.334267, 83.574625]
 		occurrences = [mean_occurrences, std_occurrences]
 
-		feature_measurements = [width, height, rotation, area, red, green, blue, length, occurrences]
+		feature_measurements = [width, height, area, red, green, blue, length, occurrences]
 		self.init_diagnoses_group()
 		self.diagnose_group_1(feature_measurements, self.diagnoses)
 		self.diagnose_group_2(feature_measurements, self.diagnoses)
@@ -255,90 +246,68 @@ class GroupDiagnosis:
 		                                                   feature_measurements[0][0][0], feature_measurements[0][1][0])
 		diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Height'],
 		                                                   feature_measurements[1][0][0], feature_measurements[1][1][0])
-		diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Rotation'],
-		                                                   feature_measurements[2][0][0], feature_measurements[2][1][0])
-		diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Area'],
-		                                                   feature_measurements[3][0][0], feature_measurements[3][1][0])
-		# diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
-		#                                                   feature_measurements[4][0][0], feature_measurements[4][0][1])
+		# diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Area'],
+		#                                                    feature_measurements[2][0][0], feature_measurements[2][1][0])
+		diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
+		                                                  feature_measurements[3][0][0], feature_measurements[3][0][1])
 		# diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Colour'][1],
-		#                                                   feature_measurements[5][0][0], feature_measurements[5][0][1])
-		# diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
-		#                                                   feature_measurements[6][0][0], feature_measurements[6][0][1])
-		diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Length'],
-		                                                   feature_measurements[7][0][0], feature_measurements[7][1][0])
+		#                                                   feature_measurements[4][0][0], feature_measurements[4][0][1])
+		diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
+		                                                  feature_measurements[5][0][0], feature_measurements[5][0][1])
+		# diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Length'],
+		#                                                    feature_measurements[6][0][0], feature_measurements[6][1][0])
 		diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Occurrences'],
-		                                                  feature_measurements[8][0][0], feature_measurements[8][1][0])
+		                                                  feature_measurements[7][0][0], feature_measurements[7][1][0])
 
 	def diagnose_group_2(self, feature_measurements, diagnoses):
 		diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Width'],
 		                                                   feature_measurements[0][0][1], feature_measurements[0][1][1])
 		diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Height'],
 		                                                   feature_measurements[1][0][1], feature_measurements[1][1][1])
-		diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Rotation'],
-		                                                   feature_measurements[2][0][1], feature_measurements[2][1][1])
-		diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Area'],
-		                                                   feature_measurements[3][0][1], feature_measurements[3][1][1])
-		# diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
-		#                                                   feature_measurements[4][1][0], feature_measurements[4][1][1])
+		# diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Area'],
+		#                                                    feature_measurements[2][0][1], feature_measurements[2][1][1])
+		diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
+		                                                  feature_measurements[3][1][0], feature_measurements[3][1][1])
 		# diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Colour'][1],
-		#                                                   feature_measurements[5][1][0], feature_measurements[5][1][1])
-		# diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
-		#                                                   feature_measurements[6][1][0], feature_measurements[6][1][1])
-		diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Length'],
-		                                                   feature_measurements[7][0][1], feature_measurements[7][1][1])
+		#                                                   feature_measurements[4][1][0], feature_measurements[4][1][1])
+		diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
+		                                                  feature_measurements[5][1][0], feature_measurements[5][1][1])
+		# diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Length'],
+		#                                                    feature_measurements[6][0][1], feature_measurements[6][1][1])
 		diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Occurrences'],
-		                                                  feature_measurements[8][0][1], feature_measurements[8][1][1])
+		                                                  feature_measurements[7][0][1], feature_measurements[7][1][1])
 
 	def diagnose_group_3(self, feature_measurements, diagnoses):
 		diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Width'],
 		                                                   feature_measurements[0][0][2], feature_measurements[0][1][2])
 		diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Height'],
 		                                                   feature_measurements[1][0][2], feature_measurements[1][1][2])
-		diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Rotation'],
-		                                                   feature_measurements[2][0][2], feature_measurements[2][1][2])
-		diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Area'],
-		                                                   feature_measurements[3][0][2], feature_measurements[3][1][2])
-		# diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
-		#                                                   feature_measurements[4][2][0], feature_measurements[4][2][1])
+		# diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Area'],
+		#                                                    feature_measurements[2][0][2], feature_measurements[2][1][2])
+		diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Colour'][0],
+		                                                  feature_measurements[3][2][0], feature_measurements[3][2][1])
 		# diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Colour'][1],
-		#                                                   feature_measurements[5][2][0], feature_measurements[5][2][1])
-		# diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
-		#                                                   feature_measurements[6][2][0], feature_measurements[6][2][1])
-		diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Length'],
-		                                                   feature_measurements[7][0][2], feature_measurements[7][1][2])
+		#                                                   feature_measurements[4][2][0], feature_measurements[4][2][1])
+		diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Colour'][2],
+		                                                  feature_measurements[5][2][0], feature_measurements[5][2][1])
+		# diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Length'],
+		#                                                    feature_measurements[6][0][2], feature_measurements[6][1][2])
 		diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Occurrences'],
-		                                                   feature_measurements[8][0][2], feature_measurements[8][1][2])
-
-	def vote_for_group(self):
-		max_key = max(self.diagnoses, key=lambda k: self.diagnoses[k])
-		if max_key == 'Group 1':
-			self.votes[0] += 1
-		elif max_key == 'Group 1':
-			self.votes[1] += 1
-		elif max_key == 'Group 3':
-			self.votes[2] += 1
+		                                                   feature_measurements[7][0][2], feature_measurements[7][1][2])
 
 	def normalisation_constant(self):
 		return self.diagnoses['Group 1'] + self.diagnoses['Group 2'] + self.diagnoses['Group 3']
 
-	def determine_vote(self):
-		if self.votes.index(max(self.votes)) == 0:
-			print('\nGroup 1 IPCL. Probability:', self.diagnoses['Group 1'] / self.normalisation_constant() * 100)
-			print(self.votes)
-		elif self.votes.index(max(self.votes)) == 1:
-			print('\nGroup 2 IPCL. Probability:', self.diagnoses['Group 2'] / self.normalisation_constant() * 100)
-			print(self.votes)
-		elif self.votes.index(max(self.votes)) == 2:
-			print('\nGroup 3 IPCL. Probability:', self.diagnoses['Group 3'] / self.normalisation_constant() * 100)
-			print(self.votes)
-
 	def determine_group(self):
 		if max(self.diagnoses.values()) == self.diagnoses['Group 1']:
 			print('\nGroup 1 IPCL. Probability:', self.diagnoses['Group 1'] / self.normalisation_constant() * 100)
+			print('\nGroup 2 IPCL. Probability:', self.diagnoses['Group 2'] / self.normalisation_constant() * 100)
+			print('\nGroup 3 IPCL. Probability:', self.diagnoses['Group 3'] / self.normalisation_constant() * 100)
 		elif max(self.diagnoses.values()) == self.diagnoses['Group 2']:
 			print('\nGroup 2 IPCL. Probability:', self.diagnoses['Group 2'] / self.normalisation_constant() * 100)
+			print('\nGroup 1 IPCL. Probability:', self.diagnoses['Group 1'] / self.normalisation_constant() * 100)
+			print('\nGroup 3 IPCL. Probability:', self.diagnoses['Group 3'] / self.normalisation_constant() * 100)
 		elif max(self.diagnoses.values()) == self.diagnoses['Group 3']:
 			print('\nGroup 3 IPCL. Probability:', self.diagnoses['Group 3'] / self.normalisation_constant() * 100)
-
-
+			print('\nGroup 2 IPCL. Probability:', self.diagnoses['Group 2'] / self.normalisation_constant() * 100)
+			print('\nGroup 1 IPCL. Probability:', self.diagnoses['Group 1'] / self.normalisation_constant() * 100)
