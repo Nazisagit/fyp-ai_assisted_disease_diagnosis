@@ -343,18 +343,18 @@ class FeatureDetector:
             cv2.imwrite(self.output_folder + '_final_output_' + name, output)
 
             # To illustrate the results uncomment the lines below
-            fig = plt.figure()
-            plt.subplot(131)
-            plt.imshow(frame)
-            plt.title('Original')
-            plt.subplot(132)
-            plt.imshow(roi)
-            plt.title('ROI')
-            plt.subplot(133)
-            plt.imshow(output)
-            plt.title('Extracted Features')
-            plt.suptitle('Step 4. Extracting Features From Blobs.', fontsize=16)
-            plt.show()
+            # fig = plt.figure()
+            # plt.subplot(131)
+            # plt.imshow(frame)
+            # plt.title('Original')
+            # plt.subplot(132)
+            # plt.imshow(roi)
+            # plt.title('ROI')
+            # plt.subplot(133)
+            # plt.imshow(output)
+            # plt.title('Extracted Features')
+            # plt.suptitle('Step 4. Extracting Features From Blobs.', fontsize=16)
+            # plt.show()
 
     # Checks if detected IPCL is actually the glare, i.e. if some
     # small glare region was not excluded by glare detection software.
@@ -440,7 +440,7 @@ class FeatureDetector:
                 print(width + ' | ' + height + ' | ' + area + ' | ' + colour + ' | ' + length + ' |')
             print('---------------------------------------------------------------------------------------------')
             print('{:^76}'.format('TOTAL: ' + str(len(table))))
-            print('--------------------------------------------------------------------------------------------- \n')
+            print('---------------------------------------------------------------------------------------------\n')
 
     # 14/02/2019
     def get_feature_tables(self):
@@ -462,4 +462,4 @@ class FeatureDetector:
         print('\r%s |%s| %s%% %s' % ('Progress', bar, percent, 'Complete'), end='\r')
         # Print New Line on Complete
         if iteration == total:
-            print()
+            print('\n')

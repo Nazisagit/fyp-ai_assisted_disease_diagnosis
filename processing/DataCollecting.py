@@ -1,4 +1,4 @@
-# Filename: DataProcessing.py
+# Filename: DataCollecting.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
 # Opened 23/02/2019
@@ -6,25 +6,6 @@
 import pandas as pd
 import csv
 import os
-
-
-class DataProcessing:
-
-	@staticmethod
-	def calculate_mean(csv_input):
-		return pd.read_csv(csv_input).mean()
-
-	@staticmethod
-	def calculate_median(csv_input):
-		return pd.read_csv(csv_input).median()
-
-	@staticmethod
-	def calculate_std(csv_input):
-		return pd.read_csv(csv_input).std()
-
-	@staticmethod
-	def calculate_modes(csv_input):
-		return pd.read_csv(csv_input).mode()
 
 
 class DataCollecting:
@@ -99,31 +80,27 @@ class DataCollecting:
 	def save_data(self):
 		width_list = list()
 		height_list = list()
-		rotation_list = list()
 		area_list = list()
 		colour_list = list()
 		length_list = list()
 
 		for table in self.feature_tables:
 			table_height = len(table)
-			for feature in [0, 1, 2, 3, 4, 5]:
+			for feature in [0, 1, 2, 3, 4]:
 				for row in range(0, table_height):
 					if feature == 0:
 						width_list.append(table[row][feature])
 					elif feature == 1 and table[row][feature] > 0:
 						height_list.append(table[row][feature])
 					elif feature == 2 and table[row][feature] > 0:
-						rotation_list.append(abs(table[row][feature]))
-					elif feature == 3 and table[row][feature] > 0:
 						area_list.append(table[row][feature])
-					elif feature == 4 and len(table[row][feature]) > 0:
+					elif feature == 3 and len(table[row][feature]) > 0:
 						colour_list.append(table[row][feature])
-					elif feature == 5 and table[row][feature] > 0:
+					elif feature == 4 and table[row][feature] > 0:
 						length_list.append(table[row][feature])
 
 			self.save_width(width_list, self.ipcl_type)
 			self.save_height(height_list, self.ipcl_type)
-			self.save_rotation(rotation_list, self.ipcl_type)
 			self.save_area(area_list, self.ipcl_type)
 			self.save_colour(colour_list, self.ipcl_type)
 			self.save_length(length_list, self.ipcl_type)
@@ -142,13 +119,6 @@ class DataCollecting:
 			height_writer = csv.writer(height_file)
 			for height in height_list:
 				height_writer.writerow([str(height)])
-
-	def save_rotation(self, rotation_list, ipcl_type):
-		output = self.data_output + ipcl_type
-		with open(output + 'rotation.csv', 'a', newline='') as rotation_file:
-			rotation_writer = csv.writer(rotation_file)
-			for rotation in rotation_list:
-				rotation_writer.writerow([str(rotation)])
 
 	def save_area(self, area_list, ipcl_type):
 		output = self.data_output + ipcl_type

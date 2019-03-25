@@ -3,11 +3,15 @@
 # Institution: King's College London
 # Created: 21/03/2019
 
-from sklearn.svm import LinearSVC
 import pandas as pd
-from functools import reduce
-from collections import Counter
 import numpy as np
+from time import time
+
+from sklearn.decomposition import PCA
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.svm import LinearSVC
+from sklearn.model_selection import KFold
 
 
 class Diagnosis:
@@ -18,8 +22,9 @@ class Diagnosis:
 		self.statistical_diagnoses_output = statistical_diagnoses_output
 		self.diagnoses = dict()
 		self.statistics = dict()
+		self.features_df = None
 
-	def analyse_feature_tables(self):
+	def create_feature_dataframe(self):
 		width_list = list()
 		height_list = list()
 		area_list = list()
@@ -45,174 +50,136 @@ class Diagnosis:
 					elif feature == 4:
 						length_list.append(table[row][feature])
 
-		features_df = pd.DataFrame({
+		self.features_df = pd.DataFrame({
 			'Width': width_list,
 			'Height': height_list,
 			'Red': red_list,
 			'Green': green_list,
-			'Blue': blue_list,
-			'Length': length_list
+			# 'Blue': blue_list,
+			# 'Length': length_list
 		})
 
-		print('\n', features_df)
+	def diagnose(self, clf):
+		t0 = time()
+		prediction = clf.predict(self.features_df)
+		print('Classification prediction done in %0.3fs' % (time() - t0))
+		max_pred_class, percentage = self.calculate_prediction_percentage(prediction)
+		print('Prediction: ', max_pred_class, ' at ', percentage, '%')
 
-	def svm(self, sample_amt):
-		group1 = self.group1().sample(n=sample_amt)
-		group2 = self.group2().sample(n=sample_amt)
-		group3 = self.group3().sample(n=sample_amt)
-		x = group1.append([group2, group3])
-		print(x)
+	@staticmethod
+	def calculate_prediction_percentage(prediction):
+		counts = np.bincount(prediction)
+		max_count = np.argmax(counts)
+		percentage = (max(counts)/len(prediction)) * 100
+		return max_count, percentage
+
+	def train(self, sample_amt, max_iter):
+		group1 = self.group1().sample(n=sample_amt, random_state=1)
+		group2 = self.group2().sample(n=sample_amt, random_state=1)
+		group3 = self.group3().sample(n=sample_amt, random_state=1)
+		x = group1.append([group2, group3], ignore_index=True)
 		y = self.create_y(sample_amt)
 
-	def create_y(self, amt):
+		t0 = time()
+		x_train_pca, x_test_pca, y_train, y_test = self.pca(x, y)
+		print('\nPrincipal component analysis done in %0.3fs' % (time() - t0))
+
+		t1 = time()
+		clf = LinearSVC(random_state=1, multi_class='ovr', max_iter=max_iter, penalty='l2')
+		clf.fit(x_train_pca, y_train)
+		print('Fitting done in %0.3fs' % (time() - t1), '\n')
+
+		t2 = time()
+		y_pred = clf.predict(x_test_pca)
+		print('Training classification prediction done in %0.3fs' % (time() - t2))
+		print('Training prediction: ', y_pred)
+		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
+
+		return clf
+
+	@staticmethod
+	def pca(x, y):
+		x_train, x_test, y_train, y_test = train_test_split(
+			x, y, test_size=0.25, random_state=1)
+		pca = PCA(n_components=4, svd_solver='full')
+		pca.fit(x_train)
+		x_train_pca = pca.transform(x_train)
+		x_test_pca = pca.transform(x_test)
+
+		return x_train_pca, x_test_pca, y_train, y_test
+
+	@staticmethod
+	def create_y(amt):
 		y = [1 for i in range(amt)]
 		y.extend([2 for i in range(amt)])
 		y.extend([3 for i in range(amt)])
-		y_df = pd.DataFrame({'Group': y})
-		return y_df
+		return y
+
+	def cross_validate(self, x):
+		kf = KFold(n_splits=10)
+		kf.get_n_splits(x)
 
 
 	@staticmethod
 	def group1():
+		width = pd.DataFrame(pd.read_csv('../data_output/group1/width.csv'))
+		height = pd.DataFrame(pd.read_csv('../data_output/group1/height.csv'))
 		area = pd.DataFrame(pd.read_csv('../data_output/group1/area.csv'))
 		colour = pd.DataFrame(pd.read_csv('../data_output/group1/colour.csv'))
-		height = pd.DataFrame(pd.read_csv('../data_output/group1/height.csv'))
 		length = pd.DataFrame(pd.read_csv('../data_output/group1/length.csv'))
-		width = pd.DataFrame(pd.read_csv('../data_output/group1/width.csv'))
 
+		width_subset = width.iloc[1:370000]
+		height_subset = height.iloc[1:370000]
 		area_subset = area.iloc[1:370000]
 		colour_subset = colour.iloc[1:370000]
-		height_subset = height.iloc[1:370000]
 		length_subset = length.iloc[1:370000]
-		width_subset = width.iloc[1:370000]
 
-		ac = area_subset.join(colour_subset)
-		ach = ac.join(height_subset)
-		achl = ach.join(length_subset)
-		group_1 = achl.join(width_subset)
+		wh = width_subset.join(height_subset)
+		wha = wh.join(area_subset)
+		whac = wha.join(colour_subset)
+		group_1 = whac.join(length_subset)
 
 		return group_1
 
 	@staticmethod
 	def group2():
+		width = pd.DataFrame(pd.read_csv('../data_output/group2/width.csv'))
+		height = pd.DataFrame(pd.read_csv('../data_output/group2/height.csv'))
 		area = pd.DataFrame(pd.read_csv('../data_output/group2/area.csv'))
 		colour = pd.DataFrame(pd.read_csv('../data_output/group2/colour.csv'))
-		height = pd.DataFrame(pd.read_csv('../data_output/group2/height.csv'))
 		length = pd.DataFrame(pd.read_csv('../data_output/group2/length.csv'))
-		width = pd.DataFrame(pd.read_csv('../data_output/group2/width.csv'))
 
+		width_subset = width.loc[1:1700000]
+		height_subset = height.loc[1:1700000]
 		area_subset = area.loc[1:1700000]
 		colour_subset = colour.loc[1:1700000]
-		height_subset = height.loc[1:1700000]
 		length_subset = length.loc[1:1700000]
-		width_subset = width.loc[1:1700000]
 
-		ac = area_subset.join(colour_subset)
-		ach = ac.join(height_subset)
-		achl = ach.join(length_subset)
-		group_2 = achl.join(width_subset)
+		wh = width_subset.join(height_subset)
+		wha = wh.join(area_subset)
+		whac = wha.join(colour_subset)
+		group_2 = whac.join(length_subset)
 
 		return group_2
 
 	@staticmethod
 	def group3():
+		width = pd.DataFrame(pd.read_csv('../data_output/group3/width.csv'))
+		height = pd.DataFrame(pd.read_csv('../data_output/group3/height.csv'))
 		area = pd.DataFrame(pd.read_csv('../data_output/group3/area.csv'))
 		colour = pd.DataFrame(pd.read_csv('../data_output/group3/colour.csv'))
-		height = pd.DataFrame(pd.read_csv('../data_output/group3/height.csv'))
 		length = pd.DataFrame(pd.read_csv('../data_output/group3/length.csv'))
-		width = pd.DataFrame(pd.read_csv('../data_output/group3/width.csv'))
 
-		area_subset = area.loc[1:3300000]
-		colour_subset = colour.loc[1:3300000]
-		height_subset = height.loc[1:3300000]
-		length_subset = length.loc[1:3300000]
-		width_subset = width.loc[1:3300000]
+		width_subset = width.loc[1:4600000]
+		height_subset = height.loc[1:4600000]
+		area_subset = area.loc[1:4600000]
+		colour_subset = colour.loc[1:4600000]
+		length_subset = length.loc[1:4600000]
 
-		ac = area_subset.join(colour_subset)
-		ach = ac.join(height_subset)
-		achl = ach.join(length_subset)
-		group_3 = achl.join(width_subset)
+		wh = width_subset.join(height_subset)
+		wha = wh.join(area_subset)
+		whac = wha.join(colour_subset)
+		group_3 = whac.join(length_subset)
 
 		return group_3
 
-
-	# @staticmethod
-	# def calculate_means(lists):
-	# 	means = list()
-	# 	for elements in lists:
-	# 		means.append(np.mean(elements))
-	# 	return means
-	#
-	# @staticmethod
-	# def calculate_medians(lists):
-	# 	medians = list()
-	# 	for elements in lists:
-	# 		medians.append(np.median(elements))
-	# 	return medians
-	#
-	# @staticmethod
-	# def calculate_stds(lists):
-	# 	stds = list()
-	# 	for elements in lists:
-	# 		stds.append(np.std(elements, dtype=np.float64))
-	# 	return stds
-	#
-	# def calculate_modes(self, lists):
-	# 	modes = list()
-	# 	for elements in lists:
-	# 		modes.append(self.get_mode(elements))
-	# 	return modes
-	#
-	# @staticmethod
-	# def get_mode(elements):
-	# 	counter = Counter(elements)
-	# 	if len(counter.most_common(1)) >= 1:
-	# 		_, val = counter.most_common(1)[0]
-	# 		return [x for x, y in counter.items() if y == val]
-	# 	else:
-	# 		return []
-	#
-	# def add_to_statistics(self, means, medians, stds, modes):
-	# 	self.statistics.clear()
-	# 	self.add_to_means(means)
-	# 	self.add_to_medians(medians)
-	# 	self.add_to_stds(stds)
-	# 	self.add_to_modes(modes)
-	#
-	# def add_to_means(self, means):
-	# 	self.statistics['Mean Width'] = means[0]
-	# 	self.statistics['Mean Height'] = means[1]
-	# 	self.statistics['Mean Rotation'] = means[2]
-	# 	self.statistics['Mean Area'] = means[3]
-	# 	self.statistics['Mean Colour'] = (means[4], means[5], means[6])
-	# 	self.statistics['Mean Length'] = means[7]
-	#
-	# def add_to_medians(self, medians):
-	# 	self.statistics['Median Width'] = medians[0]
-	# 	self.statistics['Median Height'] = medians[1]
-	# 	self.statistics['Median Rotation'] = medians[2]
-	# 	self.statistics['Median Area'] = medians[3]
-	# 	self.statistics['Median Colour'] = (medians[4], medians[5], medians[6])
-	# 	self.statistics['Median Length'] = medians[7]
-	#
-	# def add_to_stds(self, stds):
-	# 	self.statistics['StD Width'] = stds[0]
-	# 	self.statistics['StD Height'] = stds[1]
-	# 	self.statistics['StD Rotation'] = stds[2]
-	# 	self.statistics['StD Area'] = stds[3]
-	# 	self.statistics['StD Colour'] = (stds[4], stds[5], stds[6])
-	# 	self.statistics['StD Length'] = stds[7]
-	#
-	# def add_to_modes(self, modes):
-	# 	self.statistics['Mode Width'] = modes[0]
-	# 	self.statistics['Mode Height'] = modes[1]
-	# 	self.statistics['Mode Rotation'] = modes[2]
-	# 	self.statistics['Mode Area'] = modes[3]
-	# 	self.statistics['Mode Colour'] = (modes[4], modes[5], modes[6])
-	# 	self.statistics['Mode Length'] = modes[7]
-	#
-	# def add_occurrences(self):
-	# 	self.statistics['Mean Occurrences'] = np.mean(self.number_ipcls)
-	# 	self.statistics['Median Occurrences'] = np.median(self.number_ipcls)
-	# 	self.statistics['StD Occurrences'] = np.std(self.number_ipcls)
-	# 	self.statistics['Mode Occurrences'] = self.get_mode(self.number_ipcls)
