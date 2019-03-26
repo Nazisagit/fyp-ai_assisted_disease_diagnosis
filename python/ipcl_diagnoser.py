@@ -1,4 +1,4 @@
-# Filename: Diagnosis.py
+# Filename: ipcl_diagnoser.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
 # Created: 21/03/2019
@@ -14,11 +14,10 @@ from sklearn.svm import LinearSVC
 from sklearn.model_selection import KFold
 
 
-class Diagnosis:
+class IPCLDiagnoser:
 
-	def __init__(self, feature_tables, number_ipcls, statistical_diagnoses_output):
+	def __init__(self, feature_tables, statistical_diagnoses_output):
 		self.feature_tables = feature_tables
-		self.number_ipcls = number_ipcls
 		self.statistical_diagnoses_output = statistical_diagnoses_output
 		self.diagnoses = dict()
 		self.statistics = dict()
@@ -56,32 +55,31 @@ class Diagnosis:
 			'Red': red_list,
 			'Green': green_list,
 			# 'Blue': blue_list,
-			# 'Length': length_list
+			'Length': length_list
 		})
 
-	def diagnose(self, clf):
+	def diagnose(self, directory, amt, sample, max_iter):
+		clf = self.__train(directory=directory, amt=amt, sample=sample, max_iter=max_iter)
 		t0 = time()
 		prediction = clf.predict(self.features_df)
 		print('Classification prediction done in %0.3fs' % (time() - t0))
-		max_pred_class, percentage = self.calculate_prediction_percentage(prediction)
+		max_pred_class, percentage = self.__calculate_prediction_percentage(prediction)
 		print('Prediction: ', max_pred_class, ' at ', percentage, '%')
 
 	@staticmethod
-	def calculate_prediction_percentage(prediction):
+	def __calculate_prediction_percentage(prediction):
 		counts = np.bincount(prediction)
 		max_count = np.argmax(counts)
 		percentage = (max(counts)/len(prediction)) * 100
 		return max_count, percentage
 
-	def train(self, sample_amt, max_iter):
-		group1 = self.group1().sample(n=sample_amt, random_state=1)
-		group2 = self.group2().sample(n=sample_amt, random_state=1)
-		group3 = self.group3().sample(n=sample_amt, random_state=1)
-		x = group1.append([group2, group3], ignore_index=True)
-		y = self.create_y(sample_amt)
+	def __train(self, directory, amt, sample, max_iter):
+		# Take sample_amt from each group
+		x = self.__create_x(directory, amt, sample)
+		y = self.__create_y(sample)
 
 		t0 = time()
-		x_train_pca, x_test_pca, y_train, y_test = self.pca(x, y)
+		x_train_pca, x_test_pca, y_train, y_test = self.__pca(x, y)
 		print('\nPrincipal component analysis done in %0.3fs' % (time() - t0))
 
 		t1 = time()
@@ -98,18 +96,27 @@ class Diagnosis:
 		return clf
 
 	@staticmethod
-	def pca(x, y):
+	def __pca(x, y):
 		x_train, x_test, y_train, y_test = train_test_split(
 			x, y, test_size=0.25, random_state=1)
 		pca = PCA(n_components=4, svd_solver='full')
 		pca.fit(x_train)
 		x_train_pca = pca.transform(x_train)
 		x_test_pca = pca.transform(x_test)
-
 		return x_train_pca, x_test_pca, y_train, y_test
 
+	def __create_x(self, directory, amt, sample):
+		group1_subset = self.group_subset(self.group_(directory + 'group1/'), amt[0])
+		group2_subset = self.group_subset(self.group_(directory + 'group2/'), amt[1])
+		group3_subset = self.group_subset(self.group_(directory + 'group3/'), amt[2])
+		group1_subset_sample = group1_subset.sample(n=sample, random_state=1)
+		group2_subset_sample = group2_subset.sample(n=sample, random_state=1)
+		group3_subset_sample = group3_subset.sample(n=sample, random_state=1)
+		x = group1_subset_sample.append([group2_subset_sample, group3_subset_sample], ignore_index=True)
+		return x
+
 	@staticmethod
-	def create_y(amt):
+	def __create_y(amt):
 		y = [1 for i in range(amt)]
 		y.extend([2 for i in range(amt)])
 		y.extend([3 for i in range(amt)])
@@ -119,67 +126,33 @@ class Diagnosis:
 		kf = KFold(n_splits=10)
 		kf.get_n_splits(x)
 
+	@staticmethod
+	def group_(directory):
+		width = pd.DataFrame(pd.read_csv(directory + 'width.csv'))
+		height = pd.DataFrame(pd.read_csv(directory + 'height.csv'))
+		area = pd.DataFrame(pd.read_csv(directory + 'area.csv'))
+		colour = pd.DataFrame(pd.read_csv(directory + 'colour.csv'))
+		length = pd.DataFrame(pd.read_csv(directory + 'length.csv'))
+
+		return [width, height, area, colour, length]
 
 	@staticmethod
-	def group1():
-		width = pd.DataFrame(pd.read_csv('../data_output/group1/width.csv'))
-		height = pd.DataFrame(pd.read_csv('../data_output/group1/height.csv'))
-		area = pd.DataFrame(pd.read_csv('../data_output/group1/area.csv'))
-		colour = pd.DataFrame(pd.read_csv('../data_output/group1/colour.csv'))
-		length = pd.DataFrame(pd.read_csv('../data_output/group1/length.csv'))
+	def group_length(group):
+		print('  Width  |  Height  |  Area  | Colour  | Length')
+		print([len(group[0]), len(group[1]), len(group[2]), len(group[3]), len(group[4])])
 
-		width_subset = width.iloc[1:370000]
-		height_subset = height.iloc[1:370000]
-		area_subset = area.iloc[1:370000]
-		colour_subset = colour.iloc[1:370000]
-		length_subset = length.iloc[1:370000]
+	@staticmethod
+	def group_subset(group, amt):
+		width_subset = group[0].iloc[1:amt]
+		height_subset = group[1].iloc[1:amt]
+		area_subset = group[2].iloc[1:amt]
+		colour_subset = group[3].iloc[1:amt]
+		length_subset = group[4].iloc[1:amt]
 
 		wh = width_subset.join(height_subset)
 		wha = wh.join(area_subset)
 		whac = wha.join(colour_subset)
-		group_1 = whac.join(length_subset)
+		subset = whac.join(length_subset)
 
-		return group_1
-
-	@staticmethod
-	def group2():
-		width = pd.DataFrame(pd.read_csv('../data_output/group2/width.csv'))
-		height = pd.DataFrame(pd.read_csv('../data_output/group2/height.csv'))
-		area = pd.DataFrame(pd.read_csv('../data_output/group2/area.csv'))
-		colour = pd.DataFrame(pd.read_csv('../data_output/group2/colour.csv'))
-		length = pd.DataFrame(pd.read_csv('../data_output/group2/length.csv'))
-
-		width_subset = width.loc[1:1700000]
-		height_subset = height.loc[1:1700000]
-		area_subset = area.loc[1:1700000]
-		colour_subset = colour.loc[1:1700000]
-		length_subset = length.loc[1:1700000]
-
-		wh = width_subset.join(height_subset)
-		wha = wh.join(area_subset)
-		whac = wha.join(colour_subset)
-		group_2 = whac.join(length_subset)
-
-		return group_2
-
-	@staticmethod
-	def group3():
-		width = pd.DataFrame(pd.read_csv('../data_output/group3/width.csv'))
-		height = pd.DataFrame(pd.read_csv('../data_output/group3/height.csv'))
-		area = pd.DataFrame(pd.read_csv('../data_output/group3/area.csv'))
-		colour = pd.DataFrame(pd.read_csv('../data_output/group3/colour.csv'))
-		length = pd.DataFrame(pd.read_csv('../data_output/group3/length.csv'))
-
-		width_subset = width.loc[1:4600000]
-		height_subset = height.loc[1:4600000]
-		area_subset = area.loc[1:4600000]
-		colour_subset = colour.loc[1:4600000]
-		length_subset = length.loc[1:4600000]
-
-		wh = width_subset.join(height_subset)
-		wha = wh.join(area_subset)
-		whac = wha.join(colour_subset)
-		group_3 = whac.join(length_subset)
-
-		return group_3
+		return subset
 

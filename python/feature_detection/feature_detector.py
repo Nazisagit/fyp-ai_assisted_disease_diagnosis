@@ -1,4 +1,4 @@
-# Filename: FeatureDetector.py
+# Filename: feature_detector.py
 # Author: Dmytro Poliyivets
 # Institution: King's College London
 # Copyright: 2018, Dmytro Poliyivets, King's College London
@@ -30,8 +30,6 @@ class FeatureDetector:
         self.feature_table = list()
         # 12/02/09
         self.feature_tables = list()
-        # Define a list that contains number of IPCLs per each frame
-        self.number_ipcls = list()
 
     # Main functions which starts feature detection
     def run(self):
@@ -43,8 +41,8 @@ class FeatureDetector:
 
         # Print a note to the console
         print('\nFeature extraction starts...')
-        print('\nIf you wish to see the detected IPCLs uncomment matplotlib instructions at the end of the extract_features function in FeatureDetector.py')
-        print('\nIf you wish to see the printout of the feature table uncomment line 329 in the extract_features function in FeatureDetector.py\n')
+        print('\nIf you wish to see the detected IPCLs uncomment matplotlib instructions at the end of the extract_features function in feature_detector.py')
+        print('\nIf you wish to see the printout of the feature table uncomment line 329 in the extract_features function in feature_detector.py\n')
 
         # For all files in the detected frames directory
         for file in files:
@@ -331,9 +329,6 @@ class FeatureDetector:
             self.feature_tables.append(self.feature_table)
             self.feature_table = []
 
-            # Record the number of IPCLs per current frame in the state (numberIPCLs)
-            self.number_ipcls.append(len(contours))
-
             # Print current state of the feature table to console (uncomment if need)
             # self.print_feature_table()
 
@@ -445,11 +440,6 @@ class FeatureDetector:
     # 14/02/2019
     def get_feature_tables(self):
         return self.feature_tables
-
-    # Getter for list that contains number of
-    # IPCLs per each examined frame
-    def get_number_ipcls(self):
-        return self.number_ipcls
 
     # Prints the progress bar of video analysis to the console.
     @staticmethod
