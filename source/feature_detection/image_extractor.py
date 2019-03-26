@@ -114,21 +114,4 @@ class ImageExtractor:
 		print('\r%s |%s| %s%% %s' % ('Progress', bar, percent, 'Complete'), end='\r')
 		# Print New Line on Complete
 		if iteration == total:
-			print()
-
-	# 01/02/2019
-	# Divides the image into 4 images
-	@staticmethod
-	def divide_image(frame):
-		divided_images = list()
-		imcol, imrow, _ = frame.shape
-		colstep = int(imcol/2)
-		rowstep = int(imrow/2)
-
-		for i in range(0, imcol, colstep):
-			for j in range(0, imrow, rowstep):
-				block = frame[i:i + colstep, j:j + rowstep]
-				blockcol, blockrow, _ = block.shape
-				if blockcol > 1 and blockrow > 1:
-					divided_images.append(block)
-		return divided_images
+			print('\n')

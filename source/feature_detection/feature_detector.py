@@ -441,7 +441,6 @@ class FeatureDetector:
     def get_feature_tables(self):
         return self.feature_tables
 
-    # Prints the progress bar of video analysis to the console.
     @staticmethod
     def show_progressbar(iteration, total, fill='█'):
         # The code is taken from:
