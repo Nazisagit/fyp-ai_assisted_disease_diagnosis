@@ -5,32 +5,63 @@
 
 
 import os
-from source.diagnosis.ipcl_diagnoser import IPCLDiagnoser
+import pandas as pd
+
+import source.diagnosis.ipcl_diagnoser as ipcl_diagnoser
 from source.feature_detection.image_extractor import ImageExtractor
 from source.feature_detection.feature_detector import FeatureDetector
-from source.diagnosis.trainer import train
 from argparse import ArgumentParser
 
 
-def diagnosis(images, patient_number, patient_date):
+def create_feature_dataframe(feature_tables):
+	width_list = list()
+	height_list = list()
+	area_list = list()
+	red_list = list()
+	blue_list = list()
+	green_list = list()
+	length_list = list()
+
+	for table in feature_tables:
+		table_height = len(table)
+		for feature in [0, 1, 2, 3, 4]:
+			for row in range(0, table_height):
+				if feature == 0:
+					width_list.append(table[row][feature])
+				elif feature == 1:
+					height_list.append(table[row][feature])
+				elif feature == 2:
+					area_list.append(table[row][feature])
+				elif feature == 3:
+					red_list.append(table[row][feature][0])
+					blue_list.append(table[row][feature][1])
+					green_list.append(table[row][feature][2])
+				elif feature == 4:
+					length_list.append(table[row][feature])
+
+	features_df = pd.DataFrame({
+		'Width': width_list,
+		'Red': red_list,
+		'Green': green_list,
+		'Blue': blue_list,
+		'Length': length_list
+	})
+	return features_df
+
+
+def diagnosis(input_dir, patient_number, patient_date, n_components):
 	# directory of the original endoscopic images
-	original_images = images + patient_number + '/' + patient_date + '/'
+	original_images = input_dir + patient_number + '/' + patient_date + '/'
 	# directory of the extracted images
-	extracted_images = images + 'extracted_images/' + patient_number + '/' + patient_date + '/'
+	extracted_images = input_dir + 'extracted_images/' + patient_number + '/' + patient_date + '/'
 	# directory of the feature detected images
-	detected_features = images + 'detected_features/' + patient_number + '/' + patient_date + '/'
+	detected_features = input_dir + 'detected_features/' + patient_number + '/' + patient_date + '/'
 
 	extract_images(original_images, extracted_images)
 	feature_tables = detect_features(extracted_images, detected_features)
+	feature_dataframe = create_feature_dataframe(feature_tables)
 
-	ipcl_diagnoser = IPCLDiagnoser(feature_tables, detected_features)
-	ipcl_diagnoser.create_feature_dataframe()
-
-	# Provide sample_amt to tell the diagnoser how many samples to take the same amount
-	# from each group
-	# Provide the max_iter to tell the diagnoser the max number of iterations to perform
-	# on the training set
-	ipcl_diagnoser.diagnose()
+	ipcl_diagnoser.diagnose(feature_dataframe, n_components)
 
 
 def extract_images(original_images, extracted_images):
@@ -49,9 +80,11 @@ def detect_features(extracted_images, detected_features):
 
 
 if __name__ == "__main__":
-	amt = [370000, 1700000, 4600000]
-	train('../../data_output/', amt, 150000, 2000)
-	diagnosis('../../Student Data/', '0099053314d', '2017-06-12')
+	input_dir = '../../Student Data/'
+	patient_number = '0014059011d'
+	patient_date = '2017-07-06'
+	n_components = None
+	diagnosis(input_dir, patient_number, patient_date, n_components)
 	# parser = ArgumentParser(prog='source ipcl_diagnosis.py', description='IPCL diagnosis.')
 	# parser.add_argument('-i', '--images', help='Main directory containing all the patient folders.')
 	# parser.add_argument('-p', '--patient', help='Patient\'s folder number')
