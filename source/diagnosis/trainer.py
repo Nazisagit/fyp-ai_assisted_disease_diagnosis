@@ -8,7 +8,6 @@ from time import time
 from joblib import dump
 
 from sklearn.decomposition import PCA
-from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC

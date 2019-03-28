@@ -10,7 +10,6 @@ import pandas as pd
 import source.diagnosis.ipcl_diagnoser as ipcl_diagnoser
 from source.feature_detection.image_extractor import ImageExtractor
 from source.feature_detection.feature_detector import FeatureDetector
-from argparse import ArgumentParser
 
 
 def create_feature_dataframe(feature_tables):
@@ -49,7 +48,7 @@ def create_feature_dataframe(feature_tables):
 	return features_df
 
 
-def diagnosis(input_dir, patient_number, patient_date, n_components):
+def diagnosis(input_dir, patient_number, patient_date, n_features):
 	# directory of the original endoscopic images
 	original_images = input_dir + patient_number + '/' + patient_date + '/'
 	# directory of the extracted images
@@ -61,7 +60,7 @@ def diagnosis(input_dir, patient_number, patient_date, n_components):
 	feature_tables = detect_features(extracted_images, detected_features)
 	feature_dataframe = create_feature_dataframe(feature_tables)
 
-	ipcl_diagnoser.diagnose(feature_dataframe, n_components)
+	ipcl_diagnoser.diagnose(feature_dataframe, n_features)
 
 
 def extract_images(original_images, extracted_images):
@@ -83,8 +82,8 @@ if __name__ == "__main__":
 	input_dir = '../../Student Data/'
 	patient_number = '0014059011d'
 	patient_date = '2017-07-06'
-	n_components = None
-	diagnosis(input_dir, patient_number, patient_date, n_components)
+	n_features = None
+	diagnosis(input_dir, patient_number, patient_date, n_features)
 	# parser = ArgumentParser(prog='source ipcl_diagnosis.py', description='IPCL diagnosis.')
 	# parser.add_argument('-i', '--images', help='Main directory containing all the patient folders.')
 	# parser.add_argument('-p', '--patient', help='Patient\'s folder number')
