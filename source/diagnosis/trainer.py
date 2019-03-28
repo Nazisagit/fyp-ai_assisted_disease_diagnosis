@@ -23,10 +23,10 @@ def train(input_dir, subset_size, sample_size, max_iter):
 
 	t0 = time()
 	x_train_est, x_test_est, y_train, y_test = __kbins(x, y)
-	print('\nPrincipal component analysis done in %0.3fs' % (time() - t0))
+	print('\nK-bins discretization done in %0.3fs' % (time() - t0))
 
 	t1 = time()
-	clf = LogisticRegression(random_state=1, multi_class='ovr', max_iter=max_iter, penalty='l2')
+	clf = LogisticRegression(random_state=10, solver='lbfgs', multi_class='ovr', max_iter=max_iter, penalty='l2')
 	clf.fit(x_train_est, y_train)
 	print('Fitting done in %0.3fs' % (time() - t1), '\n')
 
@@ -36,7 +36,7 @@ def train(input_dir, subset_size, sample_size, max_iter):
 	print('Training prediction: ', y_pred)
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
-	dump(clf, './clf.joblib')
+	dump(clf, './clf-lr-kbins.joblib')
 
 
 def __kbins(x, y):
@@ -52,9 +52,9 @@ def __create_x(directory, subset_size, sample_size):
 	group1_subset = __group_subset(__group(directory + 'group1/'), subset_size[0])
 	group2_subset = __group_subset(__group(directory + 'group2/'), subset_size[1])
 	group3_subset = __group_subset(__group(directory + 'group3/'), subset_size[2])
-	group1_subset_sample = group1_subset.sample(n=sample_size, random_state=1)
-	group2_subset_sample = group2_subset.sample(n=sample_size, random_state=1)
-	group3_subset_sample = group3_subset.sample(n=sample_size, random_state=1)
+	group1_subset_sample = group1_subset.sample(n=sample_size, random_state=20, replace=False)
+	group2_subset_sample = group2_subset.sample(n=sample_size, random_state=20, replace=False)
+	group3_subset_sample = group3_subset.sample(n=sample_size, random_state=20, replace=False)
 	x = group1_subset_sample.append([group2_subset_sample, group3_subset_sample], ignore_index=True)
 	return x
 

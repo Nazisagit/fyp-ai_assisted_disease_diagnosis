@@ -9,7 +9,7 @@ from joblib import load
 
 
 def diagnose(features_df, n_features):
-	clf = load('./clf.joblib')
+	clf = load('./clf-lr-kbins.joblib')
 	t0 = time()
 	prediction = clf.predict(__return_features(features_df, n_features))
 	print('Classification prediction done in %0.3fs' % (time() - t0), '\n')
