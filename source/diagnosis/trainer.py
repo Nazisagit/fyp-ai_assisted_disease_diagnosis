@@ -7,31 +7,31 @@ import pandas as pd
 from time import time
 from joblib import dump
 
-from sklearn.decomposition import PCA
+from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 
 """ This module trains a classifier for classifying IPCL
 	into either Group 1, 2, or 3.
 """
 
 
-def train(input_dir, subset_size, sample_size, max_iter, n_components):
+def train(input_dir, subset_size, sample_size, max_iter):
 	x = __create_x(input_dir, subset_size, sample_size)
 	y = __create_y(sample_size)
 
 	t0 = time()
-	x_train_pca, x_test_pca, y_train, y_test = __pca(x, y, n_components)
+	x_train_est, x_test_est, y_train, y_test = __kbins(x, y)
 	print('\nPrincipal component analysis done in %0.3fs' % (time() - t0))
 
 	t1 = time()
-	clf = LinearSVC(random_state=1, multi_class='ovr', max_iter=max_iter, penalty='l2')
-	clf.fit(x_train_pca, y_train)
+	clf = LogisticRegression(random_state=1, multi_class='ovr', max_iter=max_iter, penalty='l2')
+	clf.fit(x_train_est, y_train)
 	print('Fitting done in %0.3fs' % (time() - t1), '\n')
 
 	t2 = time()
-	y_pred = clf.predict(x_test_pca)
+	y_pred = clf.predict(x_test_est)
 	print('Training classification prediction done in %0.3fs' % (time() - t2))
 	print('Training prediction: ', y_pred)
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
@@ -39,14 +39,13 @@ def train(input_dir, subset_size, sample_size, max_iter, n_components):
 	dump(clf, './clf.joblib')
 
 
-def __pca(x, y, n_components):
+def __kbins(x, y):
 	x_train, x_test, y_train, y_test = train_test_split(
-		x, y, test_size=0.25, random_state=1)
-	pca = PCA(n_components=n_components, svd_solver='full')
-	pca.fit(x_train)
-	x_train_pca = pca.transform(x_train)
-	x_test_pca = pca.transform(x_test)
-	return x_train_pca, x_test_pca, y_train, y_test
+		x, y, test_size=0.25, random_state=10)
+	est = KBinsDiscretizer(n_bins=10, encode='ordinal', strategy='quantile')
+	x_train_est = est.fit_transform(x_train, y_train)
+	x_test_est = est.fit_transform(x_test, y_test)
+	return x_train_est, x_test_est, y_train, y_test
 
 
 def __create_x(directory, subset_size, sample_size):
@@ -92,5 +91,4 @@ if __name__ == '__main__':
 	subset_size = [370000, 1700000, 4600000]
 	sample_size = 150000
 	max_iter = 3000
-	n_components = None
-	train(input_dir, subset_size, sample_size, max_iter, n_components)
+	train(input_dir, subset_size, sample_size, max_iter)
