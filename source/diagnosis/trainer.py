@@ -10,7 +10,7 @@ from joblib import dump
 from sklearn.decomposition import PCA
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 
 """ This module trains a classifier for classifying IPCL
 	into either Group 1, 2, or 3.
@@ -26,7 +26,7 @@ def train(input_dir, subset_size, sample_size, max_iter, n_components):
 	print('\nPrincipal component analysis done in %0.3fs' % (time() - t0))
 
 	t1 = time()
-	clf = LinearSVC(random_state=1, multi_class='ovr', max_iter=max_iter, penalty='l2')
+	clf = LogisticRegression(random_state=20, solver='lbfgs',  multi_class='ovr', max_iter=max_iter, penalty='l2')
 	clf.fit(x_train_pca, y_train)
 	print('Fitting done in %0.3fs' % (time() - t1), '\n')
 
@@ -36,7 +36,7 @@ def train(input_dir, subset_size, sample_size, max_iter, n_components):
 	print('Training prediction: ', y_pred)
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
-	dump(clf, './clf.joblib')
+	dump(clf, './clf-lrp.joblib')
 
 
 def __pca(x, y, n_components):
@@ -53,9 +53,9 @@ def __create_x(directory, subset_size, sample_size):
 	group1_subset = __group_subset(__group(directory + 'group1/'), subset_size[0])
 	group2_subset = __group_subset(__group(directory + 'group2/'), subset_size[1])
 	group3_subset = __group_subset(__group(directory + 'group3/'), subset_size[2])
-	group1_subset_sample = group1_subset.sample(n=sample_size, random_state=1)
-	group2_subset_sample = group2_subset.sample(n=sample_size, random_state=1)
-	group3_subset_sample = group3_subset.sample(n=sample_size, random_state=1)
+	group1_subset_sample = group1_subset.sample(n=sample_size, random_state=10)
+	group2_subset_sample = group2_subset.sample(n=sample_size, random_state=20)
+	group3_subset_sample = group3_subset.sample(n=sample_size, random_state=40)
 	x = group1_subset_sample.append([group2_subset_sample, group3_subset_sample], ignore_index=True)
 	return x
 
