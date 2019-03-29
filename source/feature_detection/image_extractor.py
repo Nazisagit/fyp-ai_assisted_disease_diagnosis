@@ -30,14 +30,7 @@ class ImageExtractor:
 				counter += 1
 				if self.get_darkness_percent(image) < 0.3:
 					cropped_image = self.crop_frame(image)
-					# 01/02/2019
-					# Each divided image gets saved as cropped and divided
-					# divided_image = self.divide_image(cropped_image)
-					# for i in range(len(divided_image)):
-					# 	img = divided_image[i]
-					# 	final_output = self.output_folder + str(i) + '_cropped_and_divided_' + str(file)
-					# 	cv2.imwrite(final_output, img)
-					final_output = self.output_folder + '_cropped_and_divided_' + str(file)
+					final_output = self.output_folder + '_cropped_' + str(file)
 					cv2.imwrite(final_output, cropped_image)
 
 	def crop_frame(self, frame):

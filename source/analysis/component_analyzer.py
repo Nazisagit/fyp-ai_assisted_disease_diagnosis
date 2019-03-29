@@ -14,14 +14,14 @@ def __group(directory):
 	height = pd.DataFrame(pd.read_csv(directory + 'height.csv'))
 	area = pd.DataFrame(pd.read_csv(directory + 'area.csv'))
 	colour = pd.DataFrame(pd.read_csv(directory + 'colour.csv'))
-	length = pd.DataFrame(pd.read_csv(directory + 'length.csv'))
+	group = [width, height, area, colour]
 
-	return [width, height, area, colour, length]
+	return group
 
 
 def __group_length(group):
-	print('  Width  |  Heigth  |  Area  | Colour  | Length')
-	print([len(group[0]), len(group[1]), len(group[2]), len(group[3]), len(group[4])])
+	for g in group:
+		print(g.count())
 
 
 def __group_subset(group, amt):
@@ -29,12 +29,10 @@ def __group_subset(group, amt):
 	height_subset = group[1].iloc[1:amt]
 	area_subset = group[2].iloc[1:amt]
 	colour_subset = group[3].iloc[1:amt]
-	length_subset = group[4].iloc[1:amt]
 
 	wh = width_subset.join(height_subset)
 	wha = wh.join(area_subset)
-	whac = wha.join(colour_subset)
-	subset = whac.join(length_subset)
+	subset = wha.join(colour_subset)
 
 	return subset
 
@@ -106,11 +104,11 @@ def __check_importance(directory, amt):
 
 if __name__ == "__main__":
 	# Prints out the amounts of a specific feature that has been collected
-	__group_length(__group('../../data_output/group1/'))
-	__group_length(__group('../../data_output/group2/'))
-	__group_length(__group('../../data_output/group3/'))
-	__pca_group_1('../../data_output/', amt=370000, sample=100000, n_components=None)
-	__pca_group_2('../../data_output/', amt=1700000, sample=100000, n_components=None)
-	__pca_group_3('../../data_output/', amt=4600000, sample=100000, n_components=None)
-	__pca_combined_data('../../data_output/', [370000, 1700000, 4600000], 1500000, n_components=None)
-	__check_importance('../../data_output/', [370000, 1700000, 4600000])
+	# __group_length(__group('../../data_output-further/group1/'))
+	# __group_length(__group('../../data_output-further/group2/'))
+	# __group_length(__group('../../data_output-further/group3/'))
+	__pca_group_1('../../data_output-further/', amt=498800, sample=300000)
+	__pca_group_2('../../data_output-further/', amt=27400000, sample=300000)
+	__pca_group_3('../../data_output-further/', amt=64844000, sample=300000)
+	__pca_combined_data('../../data_output-further/', [498800, 27400000, 64844000], 3000000)
+	__check_importance('../../data_output-further/', [498800, 27400000, 64844000])

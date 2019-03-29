@@ -39,12 +39,14 @@ def create_feature_dataframe(feature_tables):
 				elif feature == 4:
 					length_list.append(table[row][feature])
 
+
 	features_df = pd.DataFrame({
 		'Width': width_list,
+		'Height': height_list,
+		'Area': area_list,
 		'Red': red_list,
 		'Green': green_list,
 		'Blue': blue_list,
-		'Length': length_list
 	})
 	return features_df
 
@@ -54,24 +56,34 @@ def diagnosis(input_dir, patient_number, patient_date):
 	original_images = input_dir + patient_number + '/' + patient_date + '/'
 	# directory of the extracted images
 	extracted_images = input_dir + 'extracted_images/' + patient_number + '/' + patient_date + '/'
+	# directory of further extracted images
+	further_extracted_images = input_dir + 'further_extracted/' + patient_number + '/' + patient_date + '/'
 	# directory of the feature detected images
 	detected_features = input_dir + 'detected_features/' + patient_number + '/' + patient_date + '/'
 
-	extract_images(original_images, extracted_images)
-	feature_tables = detect_features(extracted_images, detected_features)
+	__extract_images(original_images, extracted_images)
+	__further_extract(extracted_images, further_extracted_images)
+	feature_tables = __detect_features(further_extracted_images, detected_features)
 	feature_dataframe = create_feature_dataframe(feature_tables)
 
 	ipcl_diagnoser.diagnose(feature_dataframe)
 
 
-def extract_images(original_images, extracted_images):
+def __extract_images(original_images, extracted_images):
 	if not os.path.exists(extracted_images):
 		os.makedirs(extracted_images)
 	image_extractor = ImageExtractor(original_images, extracted_images)
 	image_extractor.extract()
 
 
-def detect_features(extracted_images, detected_features):
+def __further_extract(extracted_images, further_extracted_images):
+	if not os.path.exists(further_extracted_images):
+		os.makedirs(further_extracted_images)
+	further_extractor = FurtherExtractor(extracted_images, further_extracted_images)
+	further_extractor.run()
+
+
+def __detect_features(extracted_images, detected_features):
 	if not os.path.exists(detected_features):
 		os.makedirs(detected_features)
 	feature_detector = FeatureDetector(extracted_images, detected_features)
@@ -83,5 +95,4 @@ if __name__ == "__main__":
 	input_dir = '../../Student Data/'
 	patient_number = '0014059011d'
 	patient_date = '2017-07-06'
-	n_features = None
 	diagnosis(input_dir, patient_number, patient_date)
