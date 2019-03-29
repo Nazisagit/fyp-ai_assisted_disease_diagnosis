@@ -1,4 +1,4 @@
-# Filename: feature_detector.py
+# Filename: FeatureDetector.py
 # Author: Dmytro Poliyivets
 # Institution: King's College London
 # Copyright: 2018, Dmytro Poliyivets, King's College London
@@ -41,8 +41,8 @@ class FeatureDetector:
 
         # Print a note to the console
         print('\nFeature extraction starts...')
-        print('\nIf you wish to see the detected IPCLs uncomment matplotlib instructions at the end of the extract_features function in feature_detector.py')
-        print('\nIf you wish to see the printout of the feature table uncomment line 329 in the extract_features function in feature_detector.py\n')
+        print('\nIf you wish to see the detected IPCLs uncomment matplotlib instructions at the end of the extract_features function in FeatureDetector.py')
+        print('\nIf you wish to see the printout of the feature table uncomment line 329 in the extract_features function in FeatureDetector.py\n')
 
         # For all files in the detected frames directory
         for file in files:

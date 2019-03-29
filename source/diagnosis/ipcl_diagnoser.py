@@ -8,21 +8,22 @@ from time import time
 from joblib import load
 
 
-def diagnose(features_df, n_features):
+def diagnose(features_df):
 	clf = load('./clf.joblib')
 	t0 = time()
-	prediction = clf.predict(__return_features(features_df, n_features))
+	prediction = clf.predict(features_df)
 	print('Classification prediction done in %0.3fs' % (time() - t0), '\n')
 	print('Prediction: ', prediction)
-	max_pred_class, percentage = __calculate_prediction_percentage(prediction)
-	print('Prediction: Group ', max_pred_class, ' at %0.4fs' % percentage, '%')
+	arg_max_count, percentage, max_counts = __calculate_prediction_percentage(prediction)
+	print('Prediction: Group ', arg_max_count, ' at %0.4fs' % percentage, '%')
+	print('Prediction: ', max_counts, '/', len(prediction))
 
 
 def __calculate_prediction_percentage(prediction):
 	counts = np.bincount(prediction)
-	max_count = np.argmax(counts)
+	arg_max_count = np.argmax(counts)
 	percentage = (max(counts)/len(prediction)) * 100
-	return max_count, percentage
+	return arg_max_count, percentage, max(counts)
 
 
 def __return_features(features_df, n_features):
@@ -30,4 +31,5 @@ def __return_features(features_df, n_features):
 		return features_df
 	else:
 		return features_df.iloc[:, 0:n_features]
+
 

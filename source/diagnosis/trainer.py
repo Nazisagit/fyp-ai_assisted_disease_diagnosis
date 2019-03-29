@@ -17,16 +17,16 @@ from sklearn.svm import LinearSVC
 """
 
 
-def train(input_dir, subset_size, sample_size, max_iter, n_components):
+def train(input_dir, subset_size, sample_size, max_iter):
 	x = __create_x(input_dir, subset_size, sample_size)
 	y = __create_y(sample_size)
 
 	t0 = time()
-	x_train_pca, x_test_pca, y_train, y_test = __pca(x, y, n_components)
+	x_train_pca, x_test_pca, y_train, y_test = __pca(x, y)
 	print('\nPrincipal component analysis done in %0.3fs' % (time() - t0))
 
 	t1 = time()
-	clf = LinearSVC(random_state=1, multi_class='ovr', max_iter=max_iter, penalty='l2')
+	clf = LinearSVC(random_state=20, multi_class='ovr', max_iter=max_iter, penalty='l2')
 	clf.fit(x_train_pca, y_train)
 	print('Fitting done in %0.3fs' % (time() - t1), '\n')
 
@@ -39,10 +39,10 @@ def train(input_dir, subset_size, sample_size, max_iter, n_components):
 	dump(clf, './clf.joblib')
 
 
-def __pca(x, y, n_components):
+def __pca(x, y):
 	x_train, x_test, y_train, y_test = train_test_split(
 		x, y, test_size=0.25, random_state=1)
-	pca = PCA(n_components=n_components, svd_solver='full')
+	pca = PCA(svd_solver='full')
 	pca.fit(x_train)
 	x_train_pca = pca.transform(x_train)
 	x_test_pca = pca.transform(x_test)
@@ -53,9 +53,9 @@ def __create_x(directory, subset_size, sample_size):
 	group1_subset = __group_subset(__group(directory + 'group1/'), subset_size[0])
 	group2_subset = __group_subset(__group(directory + 'group2/'), subset_size[1])
 	group3_subset = __group_subset(__group(directory + 'group3/'), subset_size[2])
-	group1_subset_sample = group1_subset.sample(n=sample_size, random_state=1)
-	group2_subset_sample = group2_subset.sample(n=sample_size, random_state=1)
-	group3_subset_sample = group3_subset.sample(n=sample_size, random_state=1)
+	group1_subset_sample = group1_subset.sample(n=sample_size, random_state=10)
+	group2_subset_sample = group2_subset.sample(n=sample_size, random_state=20)
+	group3_subset_sample = group3_subset.sample(n=sample_size, random_state=40)
 	x = group1_subset_sample.append([group2_subset_sample, group3_subset_sample], ignore_index=True)
 	return x
 
@@ -91,6 +91,5 @@ if __name__ == '__main__':
 	input_dir = '../../data_output/'
 	subset_size = [370000, 1700000, 4600000]
 	sample_size = 150000
-	max_iter = 3000
-	n_components = None
-	train(input_dir, subset_size, sample_size, max_iter, n_components)
+	max_iter = 4000
+	train(input_dir, subset_size, sample_size, max_iter)
