@@ -10,7 +10,6 @@ import pandas as pd
 import source.diagnosis.ipcl_diagnoser as ipcl_diagnoser
 from source.feature_detection.image_extractor import ImageExtractor
 from source.feature_detection.FeatureDetector import FeatureDetector
-from source.feature_detection.FurtherExtractor import FurtherExtractor
 
 
 def create_feature_dataframe(feature_tables):

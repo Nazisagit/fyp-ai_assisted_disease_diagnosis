@@ -7,7 +7,6 @@ import csv
 import os
 from source.feature_detection.image_extractor import ImageExtractor
 from source.feature_detection.FeatureDetector import FeatureDetector
-from source.feature_detection.FurtherExtractor import FurtherExtractor
 
 """ This module collects data on the features detected 
 	from the extracted images.
