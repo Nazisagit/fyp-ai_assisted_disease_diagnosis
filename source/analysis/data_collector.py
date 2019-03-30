@@ -12,7 +12,7 @@ from source.feature_detection.FurtherExtractor import FurtherExtractor
 """ This module collects data on the features detected 
 	from the extracted images.
 	The module will collect the following types of data:
-	Width, Height, Area, Colour (split into R, G, B), and Length.
+	Width, Height, Area, Colour (R, G, B).
 """
 
 
@@ -20,7 +20,7 @@ def __init_output_files(data_output, group):
 	output = data_output + group
 	if not os.path.exists(output):
 		os.makedirs(output)
-	features = ['width', 'height', 'area', 'length']
+	features = ['width', 'height', 'area']
 	for feature in features:
 		feature_file = open(output + feature + '.csv', 'w', newline='')
 		file_writer = csv.writer(feature_file)
@@ -38,7 +38,6 @@ def __save_data(feature_tables, data_output, group):
 	red_list = list()
 	blue_list = list()
 	green_list = list()
-	length_list = list()
 
 	for table in feature_tables:
 		table_height = len(table)
@@ -54,12 +53,10 @@ def __save_data(feature_tables, data_output, group):
 					red_list.append(table[row][feature][0])
 					green_list.append(table[row][feature][1])
 					blue_list.append(table[row][feature][2])
-				elif feature == 4:
-					length_list.append(table[row][feature])
 
 		colours = [red_list, green_list, blue_list]
 		features = [width_list, height_list, area_list]
-		files = ['width.csv', 'height.csv', 'area.csv', 'length']
+		files = ['width.csv', 'height.csv', 'area.csv']
 		for i in range(3):
 			__save_feature(features[i], files[i], data_output, group)
 		__save_colours(colours, 'colour.csv', data_output, group)
@@ -70,7 +67,7 @@ def __save_feature(feature, file, data_output, group):
 	with open(output + file, 'a', newline='') as output_file:
 		file_writer = csv.writer(output_file)
 		for measurement in feature:
-			file_writer.writerow(str(measurement))
+			file_writer.writerow([str(measurement)])
 
 
 def __save_colours(colours, file, data_output, group):
@@ -78,7 +75,7 @@ def __save_colours(colours, file, data_output, group):
 	with open(output + file, 'a', newline='') as output_file:
 		file_writer = csv.writer(output_file)
 		for row in colours:
-			file_writer.writerow([str(row)[0], str(row[1]), str(row[2])])
+			file_writer.writerow([str(row[0]), str(row[1]), str(row[2])])
 
 
 def __extract_images(original_images, extracted_images):
@@ -104,7 +101,7 @@ def __detect_features(extracted_images, detected_features):
 
 
 def __check_init_files(data_output, group):
-	files = ['width.csv', 'height.csv', 'colour.csv', 'area.csv', 'length.csv']
+	files = ['width.csv', 'height.csv', 'colour.csv', 'area.csv']
 	exists = []
 	for file in files:
 		path = data_output + group + file
@@ -133,10 +130,10 @@ def collect(input_dir, patient_number, patient_date, data_output, group):
 
 if __name__ == '__main__':
 	input_dir = '../../Student Data/'
-	patient_number = '0010092102d'
-	patient_date = '2017-12-08'
+	patient_number = '0096043466d'
+	patient_date = '2018-07-06'
 	data_output = '../../data_output-further/'
 	group1 = 'group1/'
 	group2 = 'group2/'
 	group3 = 'group3/'
-	collect(input_dir, patient_number, patient_date, data_output, group1)
+	collect(input_dir, patient_number, patient_date, data_output, group3)

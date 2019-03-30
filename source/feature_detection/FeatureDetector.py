@@ -2,6 +2,7 @@
 # Author: Dmytro Poliyivets
 # Institution: King's College London
 # Copyright: 2018, Dmytro Poliyivets, King's College London
+# Last modified: 14/02/2019
 
 
 # Import statements
@@ -62,7 +63,6 @@ class FeatureDetector:
     # Finds the four triangles in each corner and mask them. Returns the
     # resulting binary image.
     def mask_corners(self, frame):
-        # 06/02/2019
         lower_black = np.array([0, 0, 0])
         upper_black = np.array([165, 105, 20])
 
@@ -300,7 +300,7 @@ class FeatureDetector:
 
                     # Get the mean BGR colour of the blob
                     blue, green, red, _ = cv2.mean(roi, mask=mask)
-                    mean_colour = (red, green, blue)
+                    mean_colour = [red, green, blue]
 
                     # Get the bounding rectangle around the blob, taking into
                     # account its area and rotation

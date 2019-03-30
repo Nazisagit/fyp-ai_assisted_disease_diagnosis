@@ -1,7 +1,7 @@
 # Filename: ipcl_diagnosis.py
-# Author: Dmytro Poliyivets
+# Author: Nazrin Pengiran
 # Institution: King's College London
-# Copyright: 2018, Dmytro Poliyivets, King's College London
+# Last modified: 30/03/2019
 
 
 import os
@@ -20,7 +20,6 @@ def create_feature_dataframe(feature_tables):
 	red_list = list()
 	blue_list = list()
 	green_list = list()
-	length_list = list()
 
 	for table in feature_tables:
 		table_height = len(table)
@@ -36,9 +35,6 @@ def create_feature_dataframe(feature_tables):
 					red_list.append(table[row][feature][0])
 					blue_list.append(table[row][feature][1])
 					green_list.append(table[row][feature][2])
-				elif feature == 4:
-					length_list.append(table[row][feature])
-
 
 	features_df = pd.DataFrame({
 		'Width': width_list,

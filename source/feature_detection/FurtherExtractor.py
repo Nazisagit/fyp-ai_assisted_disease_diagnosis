@@ -2,7 +2,7 @@
 # Author: Junkai Liao
 # Institution: King's College London
 # Version: 04/08/2018
-# Modified: 29/03/2019
+# Last modified: 29/03/2019
 
 import cv2
 from os import listdir

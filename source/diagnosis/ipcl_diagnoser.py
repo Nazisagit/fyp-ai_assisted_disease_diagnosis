@@ -9,7 +9,7 @@ from joblib import load
 
 
 def diagnose(features_df):
-	clf = load('./clf.joblib')
+	clf = load('./clf-further.joblib')
 	t0 = time()
 	prediction = clf.predict(features_df)
 	print('Classification prediction done in %0.3fs' % (time() - t0), '\n')
@@ -24,12 +24,3 @@ def __calculate_prediction_percentage(prediction):
 	arg_max_count = np.argmax(counts)
 	percentage = (max(counts)/len(prediction)) * 100
 	return arg_max_count, percentage, max(counts)
-
-
-def __return_features(features_df, n_features):
-	if n_features is None:
-		return features_df
-	else:
-		return features_df.iloc[:, 0:n_features]
-
-
