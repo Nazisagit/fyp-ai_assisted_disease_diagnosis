@@ -31,6 +31,9 @@ def __save_data(feature_tables, data_output, group):
 	height_list = list()
 	area_list = list()
 	colour_list = list()
+	red_list = list()
+	green_list = list()
+	blue_list = list()
 	length_list = list()
 
 	for table in feature_tables:
@@ -44,12 +47,14 @@ def __save_data(feature_tables, data_output, group):
 				elif feature == 2 and table[row][feature] > 0:
 					area_list.append(table[row][feature])
 				elif feature == 3 and len(table[row][feature]) > 0:
-					colour_list.append(table[row][feature])
+					red_list.append(table[row][feature][0])
+					blue_list.append(table[row][feature][1])
+					green_list.append(table[row][feature][2])
 				elif feature == 4 and table[row][feature] > 0:
 					length_list.append(table[row][feature])
 
-		features = [width_list, height_list, area_list, colour_list, length_list]
-		files = ['width.csv', 'height.csv', 'area.csv', 'colour.csv', 'length.csv']
+		features = [width_list, height_list, area_list, length_list]
+		files = ['width.csv', 'height.csv', 'area.csv', 'length.csv']
 		for i in range(4):
 			__save_feature(features[i], files[i], data_output, group)
 
@@ -60,6 +65,8 @@ def __save_feature(feature, file, data_output, group):
 		file_writer = csv.writer(output_file)
 		for measurement in feature:
 			file_writer.writerow([str(measurement)])
+
+def __save_colours(colours)
 
 
 def __extract_images(original_images, extracted_images):
