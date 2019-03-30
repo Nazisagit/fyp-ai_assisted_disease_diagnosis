@@ -10,6 +10,7 @@ from joblib import dump
 from sklearn.decomposition import PCA
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.svm import LinearSVC
 
@@ -23,20 +24,32 @@ def train(input_dir, sample_size, max_iter):
 	x = __create_x(input_dir, sample_size)
 	y = __create_y(sample_size)
 
-	x_train_pca, x_test_pca, y_train, y_test = __kbins(x, y)
+	x_train, x_test, y_train, y_test = __kbins(x, y)
 
 	t1 = time()
-	clf = LinearSVC(random_state=20, multi_class='ovr', max_iter=max_iter, penalty='l2')
-	clf.fit(x_train_pca, y_train)
+	# clf = __linearsvc(x_train, y_train, max_iter)
+	clf = __neigh(x_train, y_train)
 	print('Fitting done in %0.3fs.\n' % (time() - t1))
 
 	t2 = time()
-	y_pred = clf.predict(x_test_pca)
+	y_pred = clf.predict(x_test)
 	print('Training classification prediction done in %0.3fs.' % (time() - t2))
 	print('Training prediction: ', y_pred)
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
 	dump(clf, './clf-further.joblib')
+
+
+def __neigh(x, y):
+	neigh = KNeighborsClassifier(n_neighbors=10, weights='distance', algorithm='auto', n_jobs=-1)
+	neigh.fit(x, y)
+	return neigh
+
+
+def __linearsvc(x, y, max_iter):
+	clf = LinearSVC(random_state=20, multi_class='ovr', max_iter=max_iter, penalty='l2')
+	clf.fit(x, y)
+	return clf
 
 
 def __pca(x, y):
