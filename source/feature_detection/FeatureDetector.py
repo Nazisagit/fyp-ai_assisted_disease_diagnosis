@@ -26,7 +26,7 @@ class FeatureDetector:
         # Define an output folder to save detected features
         self.output_folder = output_folder
         # Define a table that will store extracted features, with structure:
-        # [['(X, Y) Coordinate', 'Width', 'Height', 'Rotation', 'Area', 'Colour (R,G,B)', 'Length']]
+        # [['Width', 'Height', 'Area', 'Colour (R,G,B)', 'Length']]
         self.feature_table = list()
         # 12/02/09
         self.feature_tables = list()
@@ -300,7 +300,7 @@ class FeatureDetector:
 
                     # Get the mean BGR colour of the blob
                     blue, green, red, _ = cv2.mean(roi, mask=mask)
-                    mean_colour = (red, green, blue)
+                    mean_colour = [red, green, blue]
 
                     # Get the bounding rectangle around the blob, taking into
                     # account its area and rotation

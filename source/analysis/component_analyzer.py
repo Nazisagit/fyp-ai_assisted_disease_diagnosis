@@ -20,7 +20,7 @@ def __group(directory):
 
 
 def __group_length(group):
-	print('  Width  |  Heigth  |  Area  | Colour  | Length')
+	print('  Width  |  Height  |  Area  | Colour  | Length')
 	print([len(group[0]), len(group[1]), len(group[2]), len(group[3]), len(group[4])])
 
 

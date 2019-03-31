@@ -8,6 +8,7 @@ import os
 import pandas as pd
 
 import source.diagnosis.ipcl_diagnoser as ipcl_diagnoser
+from source.diagnosis.Diagnoser import Diagnoser
 from source.feature_detection.image_extractor import ImageExtractor
 from source.feature_detection.FeatureDetector import FeatureDetector
 
@@ -60,7 +61,12 @@ def diagnosis(input_dir, patient_number, patient_date):
 	feature_tables = detect_features(extracted_images, detected_features)
 	feature_dataframe = create_feature_dataframe(feature_tables)
 
-	ipcl_diagnoser.diagnose(feature_dataframe)
+	# Diagnosis using Dmitry's Naive Bayes Classifier
+	# bayes_diagnoser = Diagnoser(feature_tables)
+	# bayes_diagnoser.analyse_feature_table()
+	# bayes_diagnoser.naiveBayes()
+
+	# ipcl_diagnoser.diagnose(feature_dataframe)
 
 
 def extract_images(original_images, extracted_images):
@@ -80,7 +86,6 @@ def detect_features(extracted_images, detected_features):
 
 if __name__ == "__main__":
 	input_dir = '../../Student Data/'
-	patient_number = '0014059011d'
-	patient_date = '2017-07-06'
-	n_features = None
+	patient_number = '0017117424d'
+	patient_date = '2017-10-17'
 	diagnosis(input_dir, patient_number, patient_date)

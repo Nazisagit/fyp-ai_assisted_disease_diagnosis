@@ -13,7 +13,6 @@ def diagnose(features_df):
 	t0 = time()
 	prediction = clf.predict(features_df)
 	print('Classification prediction done in %0.3fs' % (time() - t0), '\n')
-	print('Prediction: ', prediction)
 	arg_max_count, percentage, max_counts = __calculate_prediction_percentage(prediction)
 	print('Prediction: Group ', arg_max_count, ' at %0.4fs' % percentage, '%')
 	print('Prediction: ', max_counts, '/', len(prediction))

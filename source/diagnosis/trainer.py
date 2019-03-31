@@ -3,6 +3,7 @@
 # Institution: King's College London
 # Created: 26/03/2019
 
+import numpy as np
 import pandas as pd
 from time import time
 from joblib import dump
@@ -30,10 +31,19 @@ def train(input_dir, subset_size, sample_size, max_iter):
 	t2 = time()
 	y_pred = clf.predict(x_test)
 	print('Training classification prediction done in %0.3fs' % (time() - t2))
-	print('Training prediction: ', y_pred)
+	arg_max_count, percentage, max_counts = __calculate_prediction_percentage(y_pred)
+	print('Prediction: Group ', arg_max_count, ' at %0.4fs' % percentage, '%')
+	print('Prediction: ', max_counts, '/', len(y_pred))
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
-	dump(clf, './clf-kk.joblib')
+	# dump(clf, './clf-kk.joblib')
+
+
+def __calculate_prediction_percentage(prediction):
+	counts = np.bincount(prediction)
+	arg_max_count = np.argmax(counts)
+	percentage = (max(counts)/len(prediction)) * 100
+	return arg_max_count, percentage, max(counts)
 
 
 def __neigh(x, y):
