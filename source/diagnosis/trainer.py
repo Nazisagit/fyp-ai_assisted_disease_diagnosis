@@ -9,6 +9,7 @@ from time import time
 from joblib import dump
 
 from sklearn.decomposition import PCA
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
@@ -20,79 +21,84 @@ from sklearn.svm import LinearSVC
 """
 
 
-def train(input_dir, subset_size, sample_size, max_iter):
-	x = __create_x(input_dir, subset_size, sample_size)
+def train(input_dir, sample_size):
+	x = __create_x(input_dir, sample_size)
 	y = __create_y(sample_size)
 
-	x_train, x_test, y_train, y_test = __pca(x, y)
+	x_train, x_test, y_train, y_test = __split(x, y)
 
-	clf = __linearsvc(x, y, max_iter)
+	# x_train_pca, x_test_pca = __pca(x_train, x_test)
+	x_train_est, x_test_est = __kbins(x_train, x_test, y_train, y_test)
 
-	t2 = time()
-	y_pred = clf.predict(x_test)
-	print('Training classification prediction done in %0.3fs' % (time() - t2))
-	arg_max_count, percentage, max_counts = __calculate_prediction_percentage(y_pred)
-	print('Prediction: Group ', arg_max_count, ' at %0.4fs' % percentage, '%')
-	print('Prediction: ', max_counts, '/', len(y_pred))
+	# clf = __linearsvc(x_train_pca, y_train_pca, max_iter)
+	clf = __linearsvc(x_train_est, y_train)
+
+	t0 = time()
+	# y_pred = clf.predict(x_test_pca)
+	y_pred = clf.predict(x_test_est)
+	print('Training classification prediction done in %0.3fs' % (time() - t0))
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
 	# dump(clf, './clf-kk.joblib')
 
 
-def __calculate_prediction_percentage(prediction):
-	counts = np.bincount(prediction)
-	arg_max_count = np.argmax(counts)
-	percentage = (max(counts)/len(prediction)) * 100
-	return arg_max_count, percentage, max(counts)
+def __linearsvc(x, y):
+	t0 = time()
+	clf = LinearSVC(random_state=0, multi_class='ovr', max_iter=2000, penalty='l2')
+	clf.fit(x, y)
+	print('Fitting LinearSVC done in %0.3fs' % (time() - t0), '\n')
+	return clf
 
 
 def __neigh(x, y):
 	t0 = time()
 	neigh = KNeighborsClassifier(n_neighbors=15, weights='distance', algorithm='auto', n_jobs=2)
 	neigh.fit(x, y)
-	print('Fitting done in %0.3fs' % (time() - t0), '\n')
+	print('Fitting K-Neightbours Classifier done in %0.3fs' % (time() - t0), '\n')
 	return neigh
 
 
-def __linearsvc(x, y, max_iter):
+def __gbc(x, y):
 	t0 = time()
-	clf = LinearSVC(random_state=20, multi_class='ovr', max_iter=max_iter, penalty='l2')
-	clf.fit(x, y)
-	print('Fitting done in %0.3fs' % (time() - t0), '\n')
-	return clf
+	gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=3, random_state=0)
+	gbc.fit(x, y)
+	print('Fitting Gradient Boosting Classifier done in %0.3fs' % (time() - t0), '\n')
+	return gbc
 
 
-def __pca(x, y):
+def __pca(x_train, x_test):
 	t0 = time()
-	x_train, x_test, y_train, y_test = train_test_split(
-		x, y, test_size=0.25, random_state=1)
 	pca = PCA(svd_solver='full')
 	pca.fit(x_train)
 	x_train_pca = pca.transform(x_train)
 	x_test_pca = pca.transform(x_test)
 	print('\nPrincipal component analysis done in %0.3fs.' % (time() - t0))
-	return x_train_pca, x_test_pca, y_train, y_test
+	return x_train_pca, x_test_pca
 
 
-def __kbins(x, y):
+def __kbins(x_train, x_test, y_train, y_test):
 	t0 = time()
-	x_train, x_test, y_train, y_test = train_test_split(
-		x, y, test_size=0.25, random_state=1)
-	est = KBinsDiscretizer(n_bins=10, encode='ordinal', strategy='quantile')
+	est = KBinsDiscretizer(n_bins=5, encode='onehot', strategy='uniform')
 	x_train_est = est.fit_transform(x_train, y_train)
 	x_test_est = est.fit_transform(x_test, y_test)
-	print('\nK-bins discretization done in %0.3fs.' % (time() - t0))
-	return x_train_est, x_test_est, y_train, y_test
+	print('\nK-bins discretization pre-processing done in %0.3fs.' % (time() - t0))
+	return x_train_est, x_test_est
 
 
-def __create_x(directory, subset_size, sample_size):
-	group1_subset = __group_subset(__group(directory + 'group1/'), subset_size[0])
-	group2_subset = __group_subset(__group(directory + 'group2/'), subset_size[1])
-	group3_subset = __group_subset(__group(directory + 'group3/'), subset_size[2])
-	group1_subset_sample = group1_subset.sample(n=sample_size, random_state=10)
-	group2_subset_sample = group2_subset.sample(n=sample_size, random_state=20)
-	group3_subset_sample = group3_subset.sample(n=sample_size, random_state=40)
-	x = group1_subset_sample.append([group2_subset_sample, group3_subset_sample], ignore_index=True)
+def __split(x, y):
+	x_train, x_test, y_train, y_test = train_test_split(
+		x, y, random_state=0, test_size=0.25)
+	return x_train, x_test, y_train, y_test
+
+
+def __create_x(directory, sample_size):
+	group1 = __group(directory + 'group1/')
+	group2 = __group(directory + 'group2/')
+	group3 = __group(directory + 'group3/')
+	group1_sample = group1.sample(n=sample_size, random_state=0)
+	group2_sample = group2.sample(n=sample_size, random_state=0)
+	group3_sample = group3.sample(n=sample_size, random_state=0)
+	x = group1_sample.append([group2_sample, group3_sample], ignore_index=True)
 	return x
 
 
@@ -104,28 +110,49 @@ def __create_y(amt):
 
 
 def __group(directory):
-	width = pd.DataFrame(pd.read_csv(directory + 'width.csv'))
-	colour = pd.DataFrame(pd.read_csv(directory + 'colour.csv'))
-	length = pd.DataFrame(pd.read_csv(directory + 'length.csv'))
-	group = [width, colour, length]
+	chunksize = 10 ** 5
+
+	width_chunks = pd.read_csv(directory + 'width.csv', chunksize=chunksize)
+	width_list = list()
+	for chunk in width_chunks:
+		width_list.append(chunk)
+
+	height_chunks = pd.read_csv(directory + 'height.csv', chunksize=chunksize)
+	height_list = list()
+	for chunk in height_chunks:
+		height_list.append(chunk)
+
+	area_chunks = pd.read_csv(directory + 'area.csv', chunksize=chunksize)
+	area_list = list()
+	for chunk in area_chunks:
+		area_list.append(chunk)
+
+	colour_chunks = pd.read_csv(directory + 'colour.csv', chunksize=chunksize)
+	colour_list = list()
+	for chunk in colour_chunks:
+		colour_list.append(chunk)
+
+	# length_chunks = pd.read_csv(directory + 'length.csv', chunksize=chunksize)
+	# length_list = list()
+	# for chunk in length_chunks:
+	# 	length_list.append(chunk)
+
+	width = pd.concat(width_list)
+	height = pd.concat(height_list)
+	area = pd.concat(area_list)
+	colour = pd.concat(colour_list)
+	# length = pd.concat(length_list)
+
+	# group = width.join(height)
+	# group = group.join(area)
+	# group = group.join(colour)
+	# group = group.join(length)
+	group = width.join(colour)
 
 	return group
 
 
-def __group_subset(group, amt):
-	width_subset = group[0].iloc[1:amt]
-	colour_subset = group[1].iloc[1:amt]
-	length_subset = group[2].iloc[1:amt]
-
-	wc = width_subset.join(colour_subset)
-	subset = wc.join(length_subset)
-
-	return subset
-
-
 if __name__ == '__main__':
 	input_dir = '../../data_output/'
-	subset_size = [370000, 1700000, 4600000]
-	sample_size = 150000
-	max_iter = 1500
-	train(input_dir, subset_size, sample_size, max_iter)
+	sample_size = 200000
+	train(input_dir, sample_size)

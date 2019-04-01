@@ -10,10 +10,11 @@ import pandas as pd
 import source.diagnosis.ipcl_diagnoser as ipcl_diagnoser
 from source.diagnosis.Diagnoser import Diagnoser
 from source.feature_detection.image_extractor import ImageExtractor
+from source.feature_detection.FurtherExtractor import FurtherExtractor
 from source.feature_detection.FeatureDetector import FeatureDetector
 
 
-def create_feature_dataframe(feature_tables):
+def __create_feature_dataframe(feature_tables):
 	width_list = list()
 	height_list = list()
 	area_list = list()
@@ -41,12 +42,42 @@ def create_feature_dataframe(feature_tables):
 
 	features_df = pd.DataFrame({
 		'Width': width_list,
+		'Height': height_list,
+		'Area': area_list,
 		'Red': red_list,
 		'Green': green_list,
 		'Blue': blue_list,
 		'Length': length_list
 	})
 	return features_df
+
+
+def __extract_images(original_images, extracted_images):
+	if not os.path.exists(extracted_images):
+		os.makedirs(extracted_images)
+	image_extractor = ImageExtractor(original_images, extracted_images)
+	image_extractor.extract()
+
+
+def __further_extract(extracted_images, further_extracted_images):
+	if not os.path.exists(further_extracted_images):
+		os.makedirs(further_extracted_images)
+	further_extractor = FurtherExtractor(extracted_images, further_extracted_images)
+	further_extractor.run()
+
+
+def __detect_features(extracted_images, detected_features):
+	if not os.path.exists(detected_features):
+		os.makedirs(detected_features)
+	feature_detector = FeatureDetector(extracted_images, detected_features)
+	feature_detector.run()
+	return feature_detector.get_feature_tables()
+
+
+def __naive_bayes(feature_tables):
+	bayes_diagnoser = Diagnoser(feature_tables)
+	bayes_diagnoser.analyse_feature_table()
+	bayes_diagnoser.naiveBayes()
 
 
 def diagnosis(input_dir, patient_number, patient_date):
@@ -57,35 +88,18 @@ def diagnosis(input_dir, patient_number, patient_date):
 	# directory of the feature detected images
 	detected_features = input_dir + 'detected_features/' + patient_number + '/' + patient_date + '/'
 
-	extract_images(original_images, extracted_images)
-	feature_tables = detect_features(extracted_images, detected_features)
-	feature_dataframe = create_feature_dataframe(feature_tables)
+	__extract_images(original_images, extracted_images)
+	feature_tables = __detect_features(extracted_images, detected_features)
+	feature_dataframe = __create_feature_dataframe(feature_tables)
 
 	# Diagnosis using Dmitry's Naive Bayes Classifier
-	# bayes_diagnoser = Diagnoser(feature_tables)
-	# bayes_diagnoser.analyse_feature_table()
-	# bayes_diagnoser.naiveBayes()
+	__naive_bayes(feature_tables)
 
 	# ipcl_diagnoser.diagnose(feature_dataframe)
 
 
-def extract_images(original_images, extracted_images):
-	if not os.path.exists(extracted_images):
-		os.makedirs(extracted_images)
-	image_extractor = ImageExtractor(original_images, extracted_images)
-	image_extractor.extract()
-
-
-def detect_features(extracted_images, detected_features):
-	if not os.path.exists(detected_features):
-		os.makedirs(detected_features)
-	feature_detector = FeatureDetector(extracted_images, detected_features)
-	feature_detector.run()
-	return feature_detector.get_feature_tables()
-
-
 if __name__ == "__main__":
-	input_dir = '../../Student Data/'
+	input_dir = '../../images/'
 	patient_number = '0017117424d'
 	patient_date = '2017-10-17'
 	diagnosis(input_dir, patient_number, patient_date)
