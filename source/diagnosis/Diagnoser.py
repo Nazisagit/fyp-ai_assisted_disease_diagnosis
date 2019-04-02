@@ -169,29 +169,6 @@ class Diagnoser:
         meanWidth = [8.239755, 7.752341, 8.888387]
         sdWidth = [7.272695, 6.07759, 8.540203]
 
-        # Values when the images are further extracted
-        # Should only be used if diagnosis is used in conjunction with the
-        # FurtherExtractor
-        meanArea = [20.938419, 19.129095,]
-        sdArea = [23.425862, 16.690586,]
-
-        meanRed = [102.631596]
-        sdRed = [36.055025]
-
-        meanGreen = [75.261354]
-        sdGreen = [25.247946]
-
-        meanBlue = [95.607448]
-        sdBlue = [29.322764]
-
-        meanHeight = [7.677602]
-        sdHeight = [6.786483]
-
-        meanLength = [18.906903]
-        sdLength = [16.975428]
-
-        meanWidth = [7.982715]
-        sdWidth = [7.306057]
 
         # Perform statistical analysis of the current state of the feature table
         self.analyse_feature_table()

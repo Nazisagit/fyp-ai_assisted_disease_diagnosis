@@ -5,6 +5,7 @@
 
 import numpy as np
 import pandas as pd
+import dask.dataframe as dd
 from time import time
 from joblib import dump
 
@@ -156,3 +157,4 @@ if __name__ == '__main__':
 	input_dir = '../../data_output/'
 	sample_size = 200000
 	train(input_dir, sample_size)
+
