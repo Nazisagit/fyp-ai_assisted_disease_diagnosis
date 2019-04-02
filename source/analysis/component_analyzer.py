@@ -56,6 +56,7 @@ def __group(directory):
 
 
 def __large_group(directory, frac):
+	# http://docs.dask.org/en/latest/api.html
 	width = dd.read_csv(directory + 'width.csv')
 	height = dd.read_csv(directory + 'height.csv')
 	area = dd.read_csv(directory + 'area.csv')
@@ -78,6 +79,7 @@ def __create_y(len_g1, len_g2, len_g3):
 
 
 def __group_lengths(directory):
+	# https://towardsdatascience.com/why-and-how-to-use-pandas-with-large-data-9594dda2ea4c
 	chunksize = 10 ** 7
 
 	width_chunks = pd.read_csv(directory + 'width.csv', chunksize=chunksize)

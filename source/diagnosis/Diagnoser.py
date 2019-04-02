@@ -169,7 +169,6 @@ class Diagnoser:
         meanWidth = [8.239755, 7.752341, 8.888387]
         sdWidth = [7.272695, 6.07759, 8.540203]
 
-
         # Perform statistical analysis of the current state of the feature table
         self.analyse_feature_table()
 
