@@ -5,18 +5,16 @@
 
 import csv
 import os
-from source.feature_detection.image_extractor import ImageExtractor
-from source.feature_detection.FurtherExtractor import FurtherExtractor
+from source.feature_detection.image_extractor import extract
 from source.feature_detection.FeatureDetector import FeatureDetector
-
-""" This module collects data on the features detected 
-	from the extracted images.
-	The module will collect the following types of data:
-	Width, Height, Area, Colour (split into R, G, B), and Length.
-"""
 
 
 def __init_output_files(data_output, group):
+	"""
+	Initialises the output csv files
+	:param data_output: folder where the IPCL group folders should be
+	:param group: folder where the csv feature files should be initialised
+	"""
 	output = data_output + group
 	if not os.path.exists(output):
 		os.makedirs(output)
@@ -32,6 +30,12 @@ def __init_output_files(data_output, group):
 
 
 def __save_data(feature_tables, data_output, group):
+	"""
+	Saves the data from the endoscopic images
+	:param feature_tables: all the features tables from one patient
+	:param data_output: folder where the IPCL group folders should be
+	:param group: folder where the csv feature files should be
+	"""
 	width_list = list()
 	height_list = list()
 	area_list = list()
@@ -62,10 +66,17 @@ def __save_data(feature_tables, data_output, group):
 		files = ['width.csv', 'height.csv', 'area.csv', 'length.csv']
 		for i in range(4):
 			__save_feature(features[i], files[i], data_output, group)
-		__save_colours(colours, 'colour.csv', data_output, group)
+		__save_colours(colours, data_output, group)
 
 
 def __save_feature(feature, file, data_output, group):
+	"""
+	Saves all the features except colour
+	:param feature: either width, height, area, or length
+	:param file: the corresponding feature file
+	:param data_output: folder where the IPCL group folders should be
+	:param group: folder where the csv feature files should be
+	"""
 	output = data_output + group
 	with open(output + file, 'a', newline='') as output_file:
 		file_writer = csv.writer(output_file)
@@ -73,29 +84,41 @@ def __save_feature(feature, file, data_output, group):
 			file_writer.writerow([str(measurement)])
 
 
-def __save_colours(colours, file, data_output, group):
+def __save_colours(colours, data_output, group):
+	"""
+	Saves the red, green, and blue colours of an IPCL
+	:param colours: zip of lists of red, green, and blue
+	:param data_output: folder where the IPCL group folders should be
+	:param group: folder where the csv feature files should be
+	"""
 	output = data_output + group
-	with open(output + file, 'a', newline='') as output_file:
+	with open(output + 'colour.csv', 'a', newline='') as output_file:
 		file_writer = csv.writer(output_file)
 		for red, green, blue in colours:
 			file_writer.writerow([str(red), str(green), str(blue)])
 
 
 def __extract_images(original_images, extracted_images):
+	"""
+	Modified version of Dmitry Poliyivets's FrameExtractor
+	used to extract the regions of interest from the endoscopic images
+	:param original_images: folder where the original images should be
+	:param extracted_images: folder where the extracted images should be
+								outputted to
+	"""
 	if not os.path.exists(extracted_images):
 		os.makedirs(extracted_images)
-	image_extractor = ImageExtractor(original_images, extracted_images)
-	image_extractor.extract()
-
-
-def __further_extract(extracted_images, further_extracted_images):
-	if not os.path.exists(further_extracted_images):
-		os.makedirs(further_extracted_images)
-	further_extractor = FurtherExtractor(extracted_images, further_extracted_images)
-	further_extractor.run()
+	extract(original_images, extracted_images)
 
 
 def __detect_features(extracted_images, detected_features):
+	"""
+	Slightly modified version of Dmitry Poliyivets's FeatureDetector
+	used to detect the feature from the extracted regions of interest images
+	:param extracted_images: folder where the extracted regions of interest images
+								should be
+	:param detected_features: folder where the images with detected features should be
+	"""
 	if not os.path.exists(detected_features):
 		os.makedirs(detected_features)
 	feature_detector = FeatureDetector(extracted_images, detected_features)
@@ -104,6 +127,12 @@ def __detect_features(extracted_images, detected_features):
 
 
 def __check_init_files(data_output, group):
+	"""
+	Checks to see if the csv feature files have been initialised
+	:param data_output: folder where the IPCL group folders should be
+	:param group: folder where the csv feature files should have been initialised
+	:return: True if all the files exist
+	"""
 	files = ['width.csv', 'height.csv', 'area.csv', 'colour.csv', 'length.csv']
 	exists = list()
 	for file in files:
@@ -112,22 +141,27 @@ def __check_init_files(data_output, group):
 	return all(exists)
 
 
-def collect(input_dir, patient_number, patient_date, data_output, group):
+def collect(images, patient_number, patient_date, data_output, group):
+	"""
+	Collects and saves the data from a patient's endoscopic images
+	:param images: folder where all the image folders should be
+	:param patient_number: folder of a patient
+	:param patient_date: folder of the endoscopic images on the date taken
+	:param data_output: folder of the outputted group folders
+	:param group: folder where all the csv feature files should be
+	"""
 	# directory of the original images
-	original_images = input_dir + patient_number + '/' + patient_date + '/'
+	original_images = images + patient_number + '/' + patient_date + '/'
 	# directory of the extracted images
-	extracted_images = input_dir + 'extracted_images/' + patient_number + '/' + patient_date + '/'
-	# directory of further extracted images
-	further_extracted_images = input_dir + 'further_extracted_images/' + patient_number + '/' + patient_date + '/'
+	extracted_images = images + 'extracted_images/' + patient_number + '/' + patient_date + '/'
 	# directory of the feature detected images
-	detected_features = input_dir + 'detected_features/' + patient_number + '/' + patient_date + '/'
+	detected_features = images + 'detected_features/' + patient_number + '/' + patient_date + '/'
 
 	# extract the images
 	__extract_images(original_images, extracted_images)
 	# further extract images
-	__further_extract(extracted_images, further_extracted_images)
 	# detect the features and save them to feature tables
-	feature_tables = __detect_features(further_extracted_images, detected_features)
+	feature_tables = __detect_features(extracted_images, detected_features)
 
 	if not __check_init_files(data_output, group):
 		__init_output_files(data_output, group)

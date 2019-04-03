@@ -3,158 +3,192 @@
 # Institution: King's College London
 # Created: 26/03/2019
 
-import numpy as np
 import pandas as pd
-import dask.dataframe as dd
 from time import time
 from joblib import dump
 
-from sklearn.decomposition import PCA
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.svm import LinearSVC
 
-""" This module trains a classifier for classifying IPCL
-	into either Group 1, 2, or 3.
-"""
-
 
 def train(input_dir, sample_size):
+	"""
+	Trains either a linear support vector classifier with k-bins discretizer
+	pre-processing or gradient boosting classifier.
+	:param input_dir:
+	:param sample_size:
+	https://scikit-learn.org/stable/auto_examples/preprocessing/plot_discretization_classification.html
+	"""
+	print('Beginning training\n')
+	print('Creating samples\n')
 	x = __create_x(input_dir, sample_size)
 	y = __create_y(sample_size)
+	print('Created samples\n')
 
 	x_train, x_test, y_train, y_test = __split(x, y)
 
-	# x_train_pca, x_test_pca = __pca(x_train, x_test)
-	x_train_est, x_test_est = __kbins(x_train, x_test, y_train, y_test)
+	# Uncomment these to train the LinearSVC with K-Bins Discretizer pre-processing
+	# retransformed_x_train, retransformed_x_test = __kbins(x_train, x_test, y_train, y_test)
+	# lsvc = __linearsvc(x_train_est, y_train)
 
-	# clf = __linearsvc(x_train_pca, y_train_pca, max_iter)
-	clf = __linearsvc(x_train_est, y_train)
+	gbc = __gbc(x_train, y_train)
 
 	t0 = time()
-	# y_pred = clf.predict(x_test_pca)
-	y_pred = clf.predict(x_test_est)
-	print('Training classification prediction done in %0.3fs' % (time() - t0))
+	# Uncomment this to predict using the LinearSVC
+	# y_pred = lsvc.predict(x_test_est)
+	y_pred = gbc.predict(x_test)
+	print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
-	# dump(clf, './clf-kk.joblib')
+	dump(gbc, './gbc-c17.joblib')
 
 
 def __linearsvc(x, y):
+	"""
+	Fits the linear support vector classifier to the data
+	:param x: features
+	:param y: classes
+	:return: fitted LinearSVC
+	https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html#sklearn.svm.LinearSVC
+	"""
 	t0 = time()
-	clf = LinearSVC(random_state=0, multi_class='ovr', max_iter=2000, penalty='l2')
-	clf.fit(x, y)
+	#
+	lsvc = LinearSVC(random_state=0, multi_class='ovr', max_iter=2000, penalty='l2')
+	lsvc.fit(x, y)
 	print('Fitting LinearSVC done in %0.3fs' % (time() - t0), '\n')
-	return clf
-
-
-def __neigh(x, y):
-	t0 = time()
-	neigh = KNeighborsClassifier(n_neighbors=15, weights='distance', algorithm='auto', n_jobs=2)
-	neigh.fit(x, y)
-	print('Fitting K-Neightbours Classifier done in %0.3fs' % (time() - t0), '\n')
-	return neigh
-
-
-def __gbc(x, y):
-	t0 = time()
-	gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=3, random_state=0)
-	gbc.fit(x, y)
-	print('Fitting Gradient Boosting Classifier done in %0.3fs' % (time() - t0), '\n')
-	return gbc
-
-
-def __pca(x_train, x_test):
-	t0 = time()
-	pca = PCA(svd_solver='full')
-	pca.fit(x_train)
-	x_train_pca = pca.transform(x_train)
-	x_test_pca = pca.transform(x_test)
-	print('\nPrincipal component analysis done in %0.3fs.' % (time() - t0))
-	return x_train_pca, x_test_pca
+	return lsvc
 
 
 def __kbins(x_train, x_test, y_train, y_test):
+	"""
+	Performs data pre-processing using k-bins discretizer
+	:param x_train: features for training classifier
+	:param x_test: features for testing classifier
+	:param y_train: classes for training classifier
+	:param y_test: classes for testing classifier
+	:return: fitted x_train and x_test
+	"""
+	print('K-bins discretization pre-processing beginning.\n')
 	t0 = time()
 	est = KBinsDiscretizer(n_bins=5, encode='onehot', strategy='uniform')
 	x_train_est = est.fit_transform(x_train, y_train)
 	x_test_est = est.fit_transform(x_test, y_test)
-	print('\nK-bins discretization pre-processing done in %0.3fs.' % (time() - t0))
-	return x_train_est, x_test_est
+	retransformed_x_train = est.inverse_transform(x_train_est)
+	retransformed_x_test = est.inverse_transform(x_test_est)
+	print('K-bins discretization pre-processing done in %0.3fs.\n' % (time() - t0))
+	return retransformed_x_train, retransformed_x_test
+
+
+def __gbc(x, y):
+	"""
+	Fits the GradientBoostingClassifier to the data
+	:param x: features
+	:param y: classes
+	:return: fitted GradientBoostingClassifier
+	https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#sklearn.ensemble.GradientBoostingClassifier
+	"""
+	print('GradientBoostingClassifier fitting beginning.\n')
+	t0 = time()
+
+	gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.9, max_depth=15, random_state=0)
+	gbc.fit(x, y)
+	print('Fitting GradientBoostingClassifier done in %0.3fs.\n' % (time() - t0))
+	return gbc
 
 
 def __split(x, y):
+	"""
+	Splits the data into train and test sets
+	:param x: features
+	:param y: classes
+	:return: x_train, x_test, y_train, y_test
+	"""
 	x_train, x_test, y_train, y_test = train_test_split(
-		x, y, random_state=0, test_size=0.25)
+		x, y, random_state=40, test_size=0.25)
 	return x_train, x_test, y_train, y_test
 
 
 def __create_x(directory, sample_size):
+	"""
+	Creates the features to be used for training
+	:param directory: where the IPCL group folders should be
+	:param sample_size: the sample size to be taken from each group
+	:return: a pandas DataFrame of 3 * sample_size
+	"""
 	group1 = __group(directory + 'group1/')
 	group2 = __group(directory + 'group2/')
 	group3 = __group(directory + 'group3/')
-	group1_sample = group1.sample(n=sample_size, random_state=0)
-	group2_sample = group2.sample(n=sample_size, random_state=0)
-	group3_sample = group3.sample(n=sample_size, random_state=0)
+	group1_sample = group1.sample(n=sample_size, random_state=40)
+	group2_sample = group2.sample(n=sample_size, random_state=40)
+	group3_sample = group3.sample(n=sample_size, random_state=40)
 	x = group1_sample.append([group2_sample, group3_sample], ignore_index=True)
 	return x
 
 
 def __create_y(amt):
+	"""
+	Creates the classes to be used for training
+	:param amt: the number of classes needed for each group
+	:return: a list of classes
+	"""
 	y = [1 for i in range(amt)]
 	y.extend([2 for i in range(amt)])
 	y.extend([3 for i in range(amt)])
 	return y
 
 
-def __group(directory):
-	chunksize = 10 ** 5
+def __group(group_folder):
+	"""
+	Groups together the data from the csv feature files in one group folder.
+	Loads them in chunksizes for speed.
+	:param group_folder: where the csv feature files should be
+	:return: a pandas DataFrame of the grouped data
+	"""
+	chunksize = 10 ** 6
 
-	width_chunks = pd.read_csv(directory + 'width.csv', chunksize=chunksize)
+	width_chunks = pd.read_csv(group_folder + 'width.csv', chunksize=chunksize)
 	width_list = list()
 	for chunk in width_chunks:
 		width_list.append(chunk)
 
-	height_chunks = pd.read_csv(directory + 'height.csv', chunksize=chunksize)
+	height_chunks = pd.read_csv(group_folder + 'height.csv', chunksize=chunksize)
 	height_list = list()
 	for chunk in height_chunks:
 		height_list.append(chunk)
 
-	area_chunks = pd.read_csv(directory + 'area.csv', chunksize=chunksize)
+	area_chunks = pd.read_csv(group_folder + 'area.csv', chunksize=chunksize)
 	area_list = list()
 	for chunk in area_chunks:
 		area_list.append(chunk)
 
-	colour_chunks = pd.read_csv(directory + 'colour.csv', chunksize=chunksize)
+	colour_chunks = pd.read_csv(group_folder + 'colour.csv', chunksize=chunksize)
 	colour_list = list()
 	for chunk in colour_chunks:
 		colour_list.append(chunk)
 
-	# length_chunks = pd.read_csv(directory + 'length.csv', chunksize=chunksize)
-	# length_list = list()
-	# for chunk in length_chunks:
-	# 	length_list.append(chunk)
+	length_chunks = pd.read_csv(group_folder + 'length.csv', chunksize=chunksize)
+	length_list = list()
+	for chunk in length_chunks:
+		length_list.append(chunk)
 
 	width = pd.concat(width_list)
 	height = pd.concat(height_list)
 	area = pd.concat(area_list)
 	colour = pd.concat(colour_list)
-	# length = pd.concat(length_list)
+	length = pd.concat(length_list)
 
-	# group = width.join(height)
-	# group = group.join(area)
-	# group = group.join(colour)
+	group = width.join(height)
+	group = group.join(area)
+	group = group.join(colour)
 	# group = group.join(length)
-	group = width.join(colour)
 
 	return group
 
 
 if __name__ == '__main__':
 	input_dir = '../../data_output/'
-	sample_size = 200000
+	sample_size = 100000
 	train(input_dir, sample_size)
-

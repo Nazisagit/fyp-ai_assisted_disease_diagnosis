@@ -9,12 +9,17 @@ import pandas as pd
 
 import source.diagnosis.ipcl_diagnoser as ipcl_diagnoser
 from source.diagnosis.Diagnoser import Diagnoser
-from source.feature_detection.image_extractor import ImageExtractor
-from source.feature_detection.FurtherExtractor import FurtherExtractor
+from source.feature_detection.image_extractor import extract
 from source.feature_detection.FeatureDetector import FeatureDetector
 
 
 def __create_feature_dataframe(feature_tables):
+	"""
+	Creates a pandas DataFrame of all the features
+	:param feature_tables: list of feature tables; each feature table represents
+							one image
+	:return: returns a pandas DataFrame of all the features
+	"""
 	width_list = list()
 	height_list = list()
 	area_list = list()
@@ -47,26 +52,33 @@ def __create_feature_dataframe(feature_tables):
 		'Red': red_list,
 		'Green': green_list,
 		'Blue': blue_list,
-		'Length': length_list
+		# 'Length': length_list
 	})
 	return features_df
 
 
 def __extract_images(original_images, extracted_images):
+	"""
+	Uses the image_extractor module which is a modified version of
+	Dmitry Poliyivets's FrameExtractor.
+	Used to extract the regions of interest from the endoscopic images
+	:param original_images: folder where the original images should be
+	:param extracted_images: folder where the extracted images should be
+								outputted to
+	"""
 	if not os.path.exists(extracted_images):
 		os.makedirs(extracted_images)
-	image_extractor = ImageExtractor(original_images, extracted_images)
-	image_extractor.extract()
-
-
-def __further_extract(extracted_images, further_extracted_images):
-	if not os.path.exists(further_extracted_images):
-		os.makedirs(further_extracted_images)
-	further_extractor = FurtherExtractor(extracted_images, further_extracted_images)
-	further_extractor.run()
+	extract(original_images, extracted_images)
 
 
 def __detect_features(extracted_images, detected_features):
+	"""
+	Slightly modified version of Dmitry Poliyivets's FeatureDetector
+	used to detect the feature from the extracted regions of interest images
+	:param extracted_images: folder where the extracted regions of interest images
+								should be
+	:param detected_features: folder where the images with detected features should be
+	"""
 	if not os.path.exists(detected_features):
 		os.makedirs(detected_features)
 	feature_detector = FeatureDetector(extracted_images, detected_features)
@@ -75,27 +87,38 @@ def __detect_features(extracted_images, detected_features):
 
 
 def __naive_bayes(feature_tables):
+	"""
+
+	:param feature_tables:
+	:return:
+	"""
 	bayes_diagnoser = Diagnoser(feature_tables)
 	bayes_diagnoser.analyse_feature_table()
 	bayes_diagnoser.naiveBayes()
 
 
-def diagnosis(input_dir, patient_number, patient_date):
-	# directory of the original endoscopic images
-	original_images = input_dir + patient_number + '/' + patient_date + '/'
-	# directory of the extracted images
-	extracted_images = input_dir + 'extracted_images/' + patient_number + '/' + patient_date + '/'
-	# directory of the feature detected images
-	detected_features = input_dir + 'detected_features/' + patient_number + '/' + patient_date + '/'
+def diagnosis(images, patient_number, patient_date):
+	"""
+	Diagnoses a patient based on their endoscopic images
+	:param images: folder where all the image folders should be
+	:param patient_number: folder of a patient
+	:param patient_date: folder of the endoscopic images on the date taken
+	"""
+	# folder of the original endoscopic images
+	original_images = images + patient_number + '/' + patient_date + '/'
+	# folder of the extracted images
+	extracted_images = images + 'extracted_images/' + patient_number + '/' + patient_date + '/'
+	# folder of the feature detected images
+	detected_features = images + 'detected_features/' + patient_number + '/' + patient_date + '/'
 
 	__extract_images(original_images, extracted_images)
 	feature_tables = __detect_features(extracted_images, detected_features)
 	feature_dataframe = __create_feature_dataframe(feature_tables)
 
 	# Diagnosis using Dmitry's Naive Bayes Classifier
-	__naive_bayes(feature_tables)
+	# __naive_bayes(feature_tables)
 
-	# ipcl_diagnoser.diagnose(feature_dataframe)
+	ipcl_diagnoser.diagnose(feature_dataframe)
 
 
 if __name__ == "__main__":
