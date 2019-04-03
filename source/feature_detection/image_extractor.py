@@ -7,6 +7,12 @@ from os import listdir
 from os.path import isfile, join
 import numpy as np
 
+"""
+This module is comprised of python functions created by Dmitry Poliyivets 
+from his final year project. The functions are all needed to extract region of interest
+images. Some modifications have been made to pythonize the style of the code.
+"""
+
 
 def extract(images_path, output_folder):
 	files = [f for f in listdir(images_path) if isfile(join(images_path, f))]
@@ -66,8 +72,6 @@ def __get_darkness_percent(frame):
 	upper_dark = np.array([30, 55, 37])
 
 	mask = __hsv_colour_threshold(frame, lower_value=lower_dark, upper_value=upper_dark)
-	# 12/03/2019
-	# mask = cv2.inRange(frame, lower_dark, upper_dark)
 
 	# Calculate frame darkness percentage
 	height, width, channels = frame.shape

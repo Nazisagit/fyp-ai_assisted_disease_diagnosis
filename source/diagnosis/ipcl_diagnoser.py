@@ -11,6 +11,7 @@ from joblib import load
 
 def diagnose(features_df):
 	"""
+	Loads a classifier to diagnose the features DataFrame
 	:param features_df: pandas DataFrame of features used
 			to predict the IPCL group
 	"""
@@ -51,9 +52,10 @@ def __calculate_second_likely(prediction):
 
 def __calculate_least_likely(prediction):
 	"""
-		Calculates and prints the percentage of the class with the least
-		number of predictions
-		:param prediction: array of predictions
+	Calculates and prints the percentage of the class with the least
+	number of predictions
+	:param prediction: array of predictions
+	https://stackoverflow.com/questions/31571520/how-can-i-find-the-second-most-common-number-in-an-array
 	"""
 	a = np.array(prediction)
 	ctr = Counter(a.ravel())
