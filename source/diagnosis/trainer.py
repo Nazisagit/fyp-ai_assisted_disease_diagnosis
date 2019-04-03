@@ -1,7 +1,6 @@
 # Filename: trainer.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
-# Created: 26/03/2019
 
 import pandas as pd
 from time import time

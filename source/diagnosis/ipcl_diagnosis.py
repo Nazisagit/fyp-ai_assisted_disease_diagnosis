@@ -1,7 +1,6 @@
 # Filename: ipcl_diagnosis.py
-# Author: Dmytro Poliyivets
+# Author: Nazrin Pengiran
 # Institution: King's College London
-# Copyright: 2018, Dmytro Poliyivets, King's College London
 
 
 import os

@@ -1,7 +1,6 @@
 # Filename: ipcl_diagnoser.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
-# Created: 21/03/2019
 
 import numpy as np
 from collections import Counter

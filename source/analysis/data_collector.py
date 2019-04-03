@@ -1,7 +1,6 @@
 # Filename: data_collector.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
-# Created 23/02/2019
 
 import csv
 import os
@@ -100,8 +99,7 @@ def __save_colours(colours, data_output, group):
 
 def __extract_images(original_images, extracted_images):
 	"""
-	Modified version of Dmitry Poliyivets's FrameExtractor
-	used to extract the regions of interest from the endoscopic images
+	Extracts regions of interest from images
 	:param original_images: folder where the original images should be
 	:param extracted_images: folder where the extracted images should be
 								outputted to

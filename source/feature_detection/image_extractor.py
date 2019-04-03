@@ -1,6 +1,7 @@
 # Filename: image_extractor.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
+# Credits: Dmitry Poliyivets
 
 import cv2
 from os import listdir
@@ -9,8 +10,11 @@ import numpy as np
 
 """
 This module is comprised of python functions created by Dmitry Poliyivets 
-from his final year project. The functions are all needed to extract region of interest
-images. Some modifications have been made to pythonize the style of the code.
+from his final year project in his FrameExtractor.py file. 
+The functions are all needed to extract region of interest
+images. 
+Some modifications have been made to pythonize the style of the code, and 
+to work with .jpgs and .pngs instead of video.
 """
 
 
