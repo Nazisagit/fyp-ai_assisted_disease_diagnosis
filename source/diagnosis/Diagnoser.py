@@ -7,6 +7,7 @@
 """
 This module has been modified to pythonize it's style (e.g. function names,
 variable names).
+Other modifications are noted within the code and are marked with "Modified"
 """
 
 # Import statements
@@ -44,10 +45,14 @@ class Diagnoser:
         blue_vector = list()
         length_list = list()
 
+        # Modified
+        # iterates through several feature tables
         for table in self.feature_tables:
             # Get height of the feature table
             table_height = len(table)
-            # For Width, Height, Area, Colour, and Length
+            # Modified
+            # retrieves the following features
+            #  Width, Height, Area, Colour, and Length
             for feature in [0, 1, 2, 3, 4]:
                 # For all entries in the table
                 for row in range(0, table_height):
