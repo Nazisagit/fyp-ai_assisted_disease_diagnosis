@@ -7,6 +7,7 @@
 """
 This module has been slightly modified to pythonize it's style (e.g. function names,
 variable names).
+Other modifications are noted within the code and are marked with "Modified"
 """
 
 # Import statements
