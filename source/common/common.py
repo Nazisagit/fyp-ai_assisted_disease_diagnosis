@@ -1,7 +1,7 @@
 # Filename: common.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
-# Last modified: 05/04/2019
+# Last modified: 06/04/2019
 
 """
 Holds common functions to be used in other modules

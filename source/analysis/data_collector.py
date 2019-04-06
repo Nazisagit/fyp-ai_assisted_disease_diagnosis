@@ -1,7 +1,7 @@
 # Filename: data_collector.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
-# Last modified: 05/04/2019
+# Last modified: 06/04/2019
 
 """
 Saves the detected features into separate csv files
@@ -9,7 +9,7 @@ Saves the detected features into separate csv files
 
 import csv
 import os
-from source.common import extract_images, detect_features
+from source.common.common import extract_images, detect_features
 
 
 def __init_output_files(data_output, group):
@@ -147,7 +147,7 @@ if __name__ == '__main__':
 	input_dir = '../../images/'
 	patient_number = '0096043466d'
 	patient_date = '2018-07-06'
-	data_output = '../../data_output/'
+	data_output = '../../data_output2/'
 	group1 = 'group1/'
 	group2 = 'group2/'
 	group3 = 'group3/'

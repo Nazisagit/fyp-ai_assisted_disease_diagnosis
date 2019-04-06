@@ -1,7 +1,7 @@
 # Filename: trainer.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
-# Last modified: 05/04/2019
+# Last modified: 06/04/2019
 
 """
 Creates a trained classifier: either a
@@ -49,8 +49,8 @@ def train(input_dir, sample_size):
 	print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
-	# dump(lsvc, './lsvc-c04.joblib')
-	dump(gbc, './gbc-c09.joblib')
+	# dump(lsvc, '../classifiers/lsvc-c04.joblib')
+	dump(gbc, '../classifiers/gbc-c09.joblib')
 
 
 def __linearsvc(x, y):

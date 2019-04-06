@@ -11,10 +11,11 @@ or gradient boosting classifier.
 
 
 import pandas as pd
+import sys
 
-import source.diagnosis.ipcl_diagnoser as ipcl_diagnoser
+from source.diagnosis.ipcl_diagnoser import diagnose
 from source.diagnosis.Diagnoser import Diagnoser
-from source.common import extract_images, detect_features
+from source.common.common import extract_images, detect_features
 
 
 def __create_feature_dataframe(feature_tables):
@@ -92,12 +93,12 @@ def diagnosis(images, patient_number, patient_date, classifier):
 		__naive_bayes(feature_tables)
 	else:
 		feature_dataframe = __create_feature_dataframe(feature_tables)
-		ipcl_diagnoser.diagnose(feature_dataframe, classifier)
+		diagnose(feature_dataframe, classifier)
 
 
 if __name__ == "__main__":
 	input_dir = '../../images/'
 	patient_number = '0017021777d'
 	patient_date = '2017-03-07'
-	classifier = './lsvc-c04.joblib'
+	classifier = '../classifier/lsvc-c04.joblib'
 	diagnosis(input_dir, patient_number, patient_date, classifier)
