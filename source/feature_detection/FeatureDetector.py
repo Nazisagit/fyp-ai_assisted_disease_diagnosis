@@ -2,7 +2,12 @@
 # Author: Dmytro Poliyivets
 # Institution: King's College London
 # Copyright: 2018, Dmytro Poliyivets, King's College London
+# Last modified: 05/04/2019
 
+"""
+This module has been slightly modified to pythonize it's style (e.g. function names,
+variable names).
+"""
 
 # Import statements
 from os.path import isfile, join
@@ -14,12 +19,14 @@ import cv2
 
 # The class is intended for detection of IPCL structures in a scene and
 # extraction of features from those IPCLs. The extracted features include:
-# (X, Y) Coordinate in the scene, Width, Height, Rotation, Area, Colour (R,G,B),
-# Length, and per frame Occurrence (Total Number) of IPCLs.
+# Modified
+# Detects the following features:
+# Width, Height, Area, Colour (R,G,B), Length
 class FeatureDetector:
 
     # Class constructor
-    # 12/02/2019 added output_folder
+    # Modified
+    # added output_folder
     def __init__(self, input_folder, output_folder):
         # Define an input folder which contains the frames that has to be analysed
         self.input_folder = input_folder
@@ -28,7 +35,8 @@ class FeatureDetector:
         # Define a table that will store extracted features, with structure:
         # [['Width', 'Height', 'Area', 'Colour (R,G,B)', 'Length']]
         self.feature_table = list()
-        # 12/02/09
+        # Modified
+        # collects all the feature tables
         self.feature_tables = list()
 
     # Main functions which starts feature detection
@@ -47,6 +55,8 @@ class FeatureDetector:
         # For all files in the detected frames directory
         for file in files:
             # Check that current file has .png extension
+            # Modified
+            # can work with .jpg files
             if file.endswith('.png') or file.endswith('.jpg'):
                 # Load each image
                 frame = cv2.imread(self.input_folder + str(file))
@@ -62,11 +72,13 @@ class FeatureDetector:
     # Finds the four triangles in each corner and mask them. Returns the
     # resulting binary image.
     def mask_corners(self, frame):
-        # 06/02/2019
+        # Define the range of white color in HSV
         lower_black = np.array([0, 0, 0])
         upper_black = np.array([165, 105, 20])
 
+        # Threshold the HSV image to mark the glare parts as foreground
         mask = self.hsv_colour_threshold(frame, lower_black, upper_black)
+
         # Perform some morphology...
         # Perform morphological closing to get rid of holes inside the mask
         reduced_holes = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((50, 50), np.uint8))
@@ -77,6 +89,8 @@ class FeatureDetector:
         # Return the mask
         return dilated
 
+    # Finds glare regions in the frame and performs some morphology on those blobs
+    # returns a mask containing filtered glare regions
     def mask_glare(self, frame):
         # Define the range of white color in HSV
         lower_white = np.array([4, 8, 237])
@@ -87,6 +101,9 @@ class FeatureDetector:
 
         # Perform some morphology...
         # Perform dilation to increase the area of the blobs a little bit
+        # Modified
+        # reduced the size of the kernel to prevent large areas of the image
+        # from being filtered out
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (50, 50))
         dilated = cv2.dilate(mask, kernel, iterations=1)
         # # Perform morphological closing to get rid of holes inside the mask
@@ -242,8 +259,8 @@ class FeatureDetector:
         # plt.imshow(glare_binary)
         # plt.title('Mask Glare')
         # plt.subplot(234)
-        # plt.imshow(subtract_mask)
-        # plt.title('Subtract Mask')
+        # plt.imshow(mask)
+        # plt.title('Mask IPCLs')
         # plt.subplot(235)
         # plt.imshow(opening)
         # plt.title('Subtract Constraints & Perform Morphology')
@@ -261,7 +278,8 @@ class FeatureDetector:
 
     # Counts the number of blobs in the frame, and for each
     # blob identifies it's length and colour
-    # 12/02/2019 Added name of file to save the detected features images
+    # Modified
+    # Added name of file to save the detected features images
     def extract_features(self, name, frame, mask):
         # Get the current region of interest
         roi, mask, percentage_roi = self.get_roi(frame, mask)
@@ -312,6 +330,8 @@ class FeatureDetector:
                     # Get the length of the contour
                     length = float(self.line_length(mask))
 
+                    # Modified
+                    # does not include coordinates or rotation
                     # [['Width', 'Height', 'Area', 'Colour (R,G,B)', 'Length']]
                     row = [rect[1][0], rect[1][1], area, mean_colour, length]
 
@@ -323,7 +343,7 @@ class FeatureDetector:
                     box = np.int0(box)
                     cv2.drawContours(output, [box], 0, (0, 0, 255), 2)
 
-            # 12/02/09
+            # Modified
             # Add tables to the set and then empty the set to separate the data between frames
             # This way we can separate the data for each image and analyse each image data separately
             self.feature_tables.append(self.feature_table)
@@ -410,6 +430,7 @@ class FeatureDetector:
         # Convert RGB frame to HSV for better colour separation
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
+        # Threshold the HSV image to mark all black regions as foreground
         mask = cv2.inRange(hsv, lower_value, upper_value)
 
         return mask
@@ -437,7 +458,8 @@ class FeatureDetector:
             print('{:^76}'.format('TOTAL: ' + str(len(table))))
             print('---------------------------------------------------------------------------------------------\n')
 
-    # 14/02/2019
+    # Modified
+    # gets all the feature tables
     def get_feature_tables(self):
         return self.feature_tables
 

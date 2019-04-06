@@ -1,7 +1,12 @@
 # Filename: component_analyzer.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
+# Last modified: 05/04/2019
 
+"""
+Analyzes the features to determine the most important
+features needed to diagnose the IPCLs.
+"""
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -10,9 +15,9 @@ from time import time
 from sklearn.ensemble import ExtraTreesClassifier
 
 
-def __collect(group_folder):
+def __load_files(group_folder):
 	"""
-	Collects together the data from the csv feature files in one group folder.
+	Loads the data from the csv feature files in one group folder.
 	Loads them in chunksizes for speed.
 	https://towardsdatascience.com/why-and-how-to-use-pandas-with-large-data-9594dda2ea4c
 	:param group_folder: where the csv feature files of one group exist
@@ -62,7 +67,7 @@ def __group(group_folder):
 	:return: a pandas DataFrame of the grouped data
 	"""
 
-	width, height, area, colour, length = __collect(group_folder)
+	width, height, area, colour, length = __load_files(group_folder)
 
 	wh = width.join(height)
 	wha = wh.join(area)
@@ -92,12 +97,12 @@ def __group_lengths(group_folder):
 	:param group_folder: folder where the csv feature files should be
 	:return: lengths of width, height, area, colour, length
 	"""
-	width, height, area, colour, length = __collect(group_folder)
+	width, height, area, colour, length = __load_files(group_folder)
 
 	print(len(width), len(height), len(area), len(colour), len(length))
 
 
-def __check_importance(directory):
+def check_importance(directory):
 	"""
 	Performs feature importance and prints out the results to allow users
 	to understand which features would be most useful for classification
@@ -125,4 +130,4 @@ if __name__ == "__main__":
 	__group_lengths('../../data_output/group2/')
 	__group_lengths('../../data_output/group3/')
 	# Checks the importance of the features to decide what features are most important
-	__check_importance('../../data_output/')
+	check_importance('../../data_output/')

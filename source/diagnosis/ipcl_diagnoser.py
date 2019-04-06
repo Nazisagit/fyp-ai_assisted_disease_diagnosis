@@ -1,6 +1,13 @@
 # Filename: ipcl_diagnoser.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
+# Last modified: 05/04/2019
+
+"""
+Laods a classifier: either a linear support vector classifier
+with k-bins discretizer, or a gradient boosting classifier
+to diagnose and predict the IPCL group and level of cancer.
+"""
 
 import numpy as np
 from collections import Counter
@@ -8,19 +15,21 @@ from time import time
 from joblib import load
 
 
-def diagnose(features_df):
+def diagnose(features_df, classifier):
 	"""
 	Loads a classifier to diagnose the features DataFrame
 	:param features_df: pandas DataFrame of features used
 			to predict the IPCL group
 	"""
-	clf = load('./gbc-c17.joblib')
+	print('DISCLAIMER: This software is experimental. \n'
+	      'Please consult a qualified physician to obtain a diagnosis. \n')
+	clf = load(classifier)
 	t0 = time()
 	prediction = clf.predict(features_df)
-	print('Classification prediction done in %0.3fs' % (time() - t0), '\n')
 	__calculate_most_likely(prediction)
 	__calculate_second_likely(prediction)
 	__calculate_least_likely(prediction)
+	print('Prediction completed in %0.3fs.\n' % (time() - t0))
 
 
 def __calculate_most_likely(prediction):

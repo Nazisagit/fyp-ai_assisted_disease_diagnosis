@@ -1,6 +1,13 @@
 # Filename: trainer.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
+# Last modified: 05/04/2019
+
+"""
+Creates a trained classifier: either a
+linear support vector classifier with k-bins discretizer pre-processing,
+or a gradient boosting classifier.
+"""
 
 import pandas as pd
 from time import time
@@ -30,7 +37,7 @@ def train(input_dir, sample_size):
 	x_train, x_test, y_train, y_test = __split(x, y)
 
 	# Uncomment these to train the LinearSVC with K-Bins Discretizer pre-processing
-	# retransformed_x_train, retransformed_x_test = __kbins(x_train, x_test, y_train, y_test)
+	# x_train_est, x_test_est = __kbins(x_train, x_test, y_train, y_test)
 	# lsvc = __linearsvc(x_train_est, y_train)
 
 	gbc = __gbc(x_train, y_train)
@@ -42,7 +49,8 @@ def train(input_dir, sample_size):
 	print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
-	dump(gbc, './gbc-c17.joblib')
+	# dump(lsvc, './lsvc-c04.joblib')
+	dump(gbc, './gbc-c09.joblib')
 
 
 def __linearsvc(x, y):
@@ -54,8 +62,7 @@ def __linearsvc(x, y):
 	https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html#sklearn.svm.LinearSVC
 	"""
 	t0 = time()
-	#
-	lsvc = LinearSVC(random_state=0, multi_class='ovr', max_iter=2000, penalty='l2')
+	lsvc = LinearSVC(random_state=0, multi_class='ovr', max_iter=2500, penalty='l2')
 	lsvc.fit(x, y)
 	print('Fitting LinearSVC done in %0.3fs' % (time() - t0), '\n')
 	return lsvc
@@ -72,13 +79,11 @@ def __kbins(x_train, x_test, y_train, y_test):
 	"""
 	print('K-bins discretization pre-processing beginning.\n')
 	t0 = time()
-	est = KBinsDiscretizer(n_bins=5, encode='onehot', strategy='uniform')
+	est = KBinsDiscretizer(n_bins=10, encode='ordinal', strategy='quantile')
 	x_train_est = est.fit_transform(x_train, y_train)
 	x_test_est = est.fit_transform(x_test, y_test)
-	retransformed_x_train = est.inverse_transform(x_train_est)
-	retransformed_x_test = est.inverse_transform(x_test_est)
 	print('K-bins discretization pre-processing done in %0.3fs.\n' % (time() - t0))
-	return retransformed_x_train, retransformed_x_test
+	return x_train_est, x_test_est
 
 
 def __gbc(x, y):
@@ -92,7 +97,7 @@ def __gbc(x, y):
 	print('GradientBoostingClassifier fitting beginning.\n')
 	t0 = time()
 
-	gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.9, max_depth=15, random_state=0)
+	gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.9, max_depth=20, random_state=0)
 	gbc.fit(x, y)
 	print('Fitting GradientBoostingClassifier done in %0.3fs.\n' % (time() - t0))
 	return gbc

@@ -1,15 +1,20 @@
 # Filename: ipcl_diagnosis.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
+# Last modified: 06/04/2019
+
+"""
+Performs diagnosis, either with Dmitry's naive Bayes classifier,
+linear support vector classifier with k-bins discretizer pre-processing,
+or gradient boosting classifier.
+"""
 
 
-import os
 import pandas as pd
 
 import source.diagnosis.ipcl_diagnoser as ipcl_diagnoser
 from source.diagnosis.Diagnoser import Diagnoser
-from source.feature_detection.image_extractor import extract
-from source.feature_detection.FeatureDetector import FeatureDetector
+from source.common import extract_images, detect_features
 
 
 def __create_feature_dataframe(feature_tables):
@@ -51,52 +56,22 @@ def __create_feature_dataframe(feature_tables):
 		'Red': red_list,
 		'Green': green_list,
 		'Blue': blue_list,
-		# 'Length': length_list
+		'Length': length_list
 	})
 	return features_df
 
 
-def __extract_images(original_images, extracted_images):
-	"""
-	Uses the image_extractor module which is a modified version of
-	Dmitry Poliyivets's FrameExtractor.
-	Used to extract the regions of interest from the endoscopic images
-	:param original_images: folder where the original images should be
-	:param extracted_images: folder where the extracted images should be
-								outputted to
-	"""
-	if not os.path.exists(extracted_images):
-		os.makedirs(extracted_images)
-	extract(original_images, extracted_images)
-
-
-def __detect_features(extracted_images, detected_features):
-	"""
-	Slightly modified version of Dmitry Poliyivets's FeatureDetector
-	used to detect the feature from the extracted regions of interest images
-	:param extracted_images: folder where the extracted regions of interest images
-								should be
-	:param detected_features: folder where the images with detected features should be
-	"""
-	if not os.path.exists(detected_features):
-		os.makedirs(detected_features)
-	feature_detector = FeatureDetector(extracted_images, detected_features)
-	feature_detector.run()
-	return feature_detector.get_feature_tables()
-
-
 def __naive_bayes(feature_tables):
 	"""
-
-	:param feature_tables:
-	:return:
+	:param feature_tables: features to be used in the naive Bayes
+	diagnosis
 	"""
 	bayes_diagnoser = Diagnoser(feature_tables)
 	bayes_diagnoser.analyse_feature_table()
-	bayes_diagnoser.naiveBayes()
+	bayes_diagnoser.naive_bayes()
 
 
-def diagnosis(images, patient_number, patient_date):
+def diagnosis(images, patient_number, patient_date, classifier):
 	"""
 	Diagnoses a patient based on their endoscopic images
 	:param images: folder where all the image folders should be
@@ -110,18 +85,19 @@ def diagnosis(images, patient_number, patient_date):
 	# folder of the feature detected images
 	detected_features = images + 'detected_features/' + patient_number + '/' + patient_date + '/'
 
-	__extract_images(original_images, extracted_images)
-	feature_tables = __detect_features(extracted_images, detected_features)
-	feature_dataframe = __create_feature_dataframe(feature_tables)
-
-	# Diagnosis using Dmitry's Naive Bayes Classifier
-	# __naive_bayes(feature_tables)
-
-	ipcl_diagnoser.diagnose(feature_dataframe)
+	extract_images(original_images, extracted_images)
+	feature_tables = detect_features(extracted_images, detected_features)
+	if classifier is None:
+		# Diagnosis using Dmitry's Naive Bayes Classifier
+		__naive_bayes(feature_tables)
+	else:
+		feature_dataframe = __create_feature_dataframe(feature_tables)
+		ipcl_diagnoser.diagnose(feature_dataframe, classifier)
 
 
 if __name__ == "__main__":
 	input_dir = '../../images/'
-	patient_number = '0017117424d'
-	patient_date = '2017-10-17'
-	diagnosis(input_dir, patient_number, patient_date)
+	patient_number = '0017021777d'
+	patient_date = '2017-03-07'
+	classifier = './lsvc-c04.joblib'
+	diagnosis(input_dir, patient_number, patient_date, classifier)

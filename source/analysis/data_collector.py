@@ -1,11 +1,15 @@
 # Filename: data_collector.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
+# Last modified: 05/04/2019
+
+"""
+Saves the detected features into separate csv files
+"""
 
 import csv
 import os
-from source.feature_detection.image_extractor import extract
-from source.feature_detection.FeatureDetector import FeatureDetector
+from source.common import extract_images, detect_features
 
 
 def __init_output_files(data_output, group):
@@ -97,33 +101,6 @@ def __save_colours(colours, data_output, group):
 			file_writer.writerow([str(red), str(green), str(blue)])
 
 
-def __extract_images(original_images, extracted_images):
-	"""
-	Extracts regions of interest from images
-	:param original_images: folder where the original images should be
-	:param extracted_images: folder where the extracted images should be
-								outputted to
-	"""
-	if not os.path.exists(extracted_images):
-		os.makedirs(extracted_images)
-	extract(original_images, extracted_images)
-
-
-def __detect_features(extracted_images, detected_features):
-	"""
-	Slightly modified version of Dmitry Poliyivets's FeatureDetector
-	used to detect the feature from the extracted regions of interest images
-	:param extracted_images: folder where the extracted regions of interest images
-								should be
-	:param detected_features: folder where the images with detected features should be
-	"""
-	if not os.path.exists(detected_features):
-		os.makedirs(detected_features)
-	feature_detector = FeatureDetector(extracted_images, detected_features)
-	feature_detector.run()
-	return feature_detector.get_feature_tables()
-
-
 def __check_init_files(data_output, group):
 	"""
 	Checks to see if the csv feature files have been initialised
@@ -156,10 +133,10 @@ def collect(images, patient_number, patient_date, data_output, group):
 	detected_features = images + 'detected_features/' + patient_number + '/' + patient_date + '/'
 
 	# extract the images
-	__extract_images(original_images, extracted_images)
+	extract_images(original_images, extracted_images)
 	# further extract images
 	# detect the features and save them to feature tables
-	feature_tables = __detect_features(extracted_images, detected_features)
+	feature_tables = detect_features(extracted_images, detected_features)
 
 	if not __check_init_files(data_output, group):
 		__init_output_files(data_output, group)
@@ -170,7 +147,7 @@ if __name__ == '__main__':
 	input_dir = '../../images/'
 	patient_number = '0096043466d'
 	patient_date = '2018-07-06'
-	data_output = '../../data_output_further/'
+	data_output = '../../data_output/'
 	group1 = 'group1/'
 	group2 = 'group2/'
 	group3 = 'group3/'
