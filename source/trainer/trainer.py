@@ -20,7 +20,7 @@ from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.svm import LinearSVC
 
 
-def train(input_dir, sample_size, classifier_name):
+def train(input_dir, sample_size, dump_dir ,classifier_name):
 	"""
 	Trains either a linear support vector classifier with k-bins discretizer
 	pre-processing or gradient boosting classifier.
@@ -46,7 +46,7 @@ def train(input_dir, sample_size, classifier_name):
 		y_pred = lsvc.predict(x_test_est)
 		print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
 		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
-		dump(lsvc, 'D:/University/FYP/project/source/classifiers/{}.joblib'.format(classifier_name))
+		dump(lsvc, '{}/{}.joblib'.format(dump_dir, classifier_name))
 	elif 'gbc' in classifier_name:
 		gbc = __gbc(x_train, y_train)
 
@@ -55,7 +55,7 @@ def train(input_dir, sample_size, classifier_name):
 		print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
 		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
-		dump(gbc, 'D:/University/FYP/project/source/classifiers/{}.joblib'.format(classifier_name))
+		dump(gbc, '{}/{}.joblib'.format(dump_dir, classifier_name))
 
 
 def __linearsvc(x, y):
@@ -202,5 +202,6 @@ def __group(group_folder):
 if __name__ == '__main__':
 	input_dir = 'D:/University/FYP/project/data_output/'
 	sample_size = 100000
+	dump_dir = 'D:/University/FYP/project/source/classifiers'
 	classifier_name = 'gbc-test'
-	train(input_dir, sample_size, classifier_name)
+	train(input_dir, sample_size, dump_dir, classifier_name)
