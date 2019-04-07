@@ -72,5 +72,5 @@ def __calculate_least_likely(prediction):
 		percentage = (frequency / len(prediction)) * 100
 		print('Least likely: Group ', least_common_value, ' at %0.3fs' % percentage, '%.', frequency, '/', len(prediction), '\n')
 	except IndexError:
-		print('There was an IndexError thrown, meaning the features were only classified into 2 classes.')
+		print('\nEXCEPTION: There was an IndexError thrown, meaning the features were only classified into 2 classes.')
 
