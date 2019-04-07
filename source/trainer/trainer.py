@@ -20,13 +20,13 @@ from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.svm import LinearSVC
 
 
-def train(input_dir, sample_size, dump_dir ,classifier_name):
+def train(input_dir, sample_size, dump_dir, classifier_name):
 	"""
 	Trains either a linear support vector classifier with k-bins discretizer
 	pre-processing or gradient boosting classifier.
 	:param input_dir: folder where the group folders area
 	:param sample_size: sample to be taken from each group
-	:param features: list of features to include
+	:param dump_dir: folder to dump the classifier
 	:param classifier_name: name of the classifier
 	https://scikit-learn.org/stable/auto_examples/preprocessing/plot_discretization_classification.html
 	"""
@@ -125,7 +125,6 @@ def __create_x(directory, sample_size):
 	Creates the features to be used for training
 	:param directory: where the IPCL group folders should be
 	:param sample_size: the sample size to be taken from each group
-	:param features: list of features to include
 	:return: a pandas DataFrame of 3 * sample_size
 	"""
 	group1 = __group(directory + 'group1/')
@@ -155,7 +154,6 @@ def __group(group_folder):
 	Groups together the data from the csv feature files in one group folder.
 	Loads them in chunksizes for speed.
 	:param group_folder: where the csv feature files should be
-	:param features: list of features to include
 	:return: a pandas DataFrame of the grouped data
 	"""
 	chunksize = 10 ** 6
