@@ -1,7 +1,7 @@
 # Filename: ipcl_diagnosis.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
-# Last modified: 06/04/2019
+# Last modified: 07/04/2019
 
 """
 Performs diagnosis, either with Dmitry's naive Bayes classifier,
@@ -77,6 +77,7 @@ def diagnosis(images, patient_number, patient_date, classifier):
 	:param images: folder where all the image folders should be
 	:param patient_number: folder of a patient
 	:param patient_date: folder of the endoscopic images on the date taken
+	:param classifier: the full path to a classifier
 	"""
 	# folder of the original endoscopic images
 	original_images = images + patient_number + '/' + patient_date + '/'
@@ -97,9 +98,9 @@ def diagnosis(images, patient_number, patient_date, classifier):
 
 if __name__ == "__main__":
 	# Provide the full path to the images folder
-	input_dir = 'D:/University/FYP/project/images/'
+	images = 'D:/University/FYP/project/images/'
 	patient_number = '0017021777d'
 	patient_date = '2017-03-07'
 	# Provide the full path to the classifier
 	classifier = 'D:/University/FYP/project/source/classifiers/lsvc-c04.joblib'
-	diagnosis(input_dir, patient_number, patient_date, classifier)
+	diagnosis(images, patient_number, patient_date, classifier)
