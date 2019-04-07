@@ -49,8 +49,8 @@ def train(input_dir, sample_size):
 	print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
 	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
-	# dump(lsvc, '../classifiers/lsvc-c04.joblib')
-	dump(gbc, '../classifiers/gbc-c09.joblib')
+	# dump(lsvc, 'D:/University/FYP/project/source/classifiers/lsvc-c04.joblib')
+	dump(gbc, 'D:/University/FYP/project/source/classifiers/test.joblib')
 
 
 def __linearsvc(x, y):
@@ -193,6 +193,6 @@ def __group(group_folder):
 
 
 if __name__ == '__main__':
-	input_dir = '../../data_output/'
+	input_dir = 'D:/University/FYP/project/data_output/'
 	sample_size = 100000
 	train(input_dir, sample_size)
