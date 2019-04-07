@@ -145,7 +145,7 @@ def collect(images, patient_number, patient_date, data_output, group):
 
 if __name__ == '__main__':
 	# Provide the full path to the images folder
-	input_dir = 'D:/University/FYP/project/images/'
+	images = 'D:/University/FYP/project/images/'
 	patient_number = '0096043466d'
 	patient_date = '2018-07-06'
 	# Provide the full path to the data_output folder
@@ -153,4 +153,4 @@ if __name__ == '__main__':
 	group1 = 'group1/'
 	group2 = 'group2/'
 	group3 = 'group3/'
-	collect(input_dir, patient_number, patient_date, data_output, group3)
+	collect(images, patient_number, patient_date, data_output, group3)
