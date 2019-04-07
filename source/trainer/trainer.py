@@ -20,12 +20,14 @@ from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.svm import LinearSVC
 
 
-def train(input_dir, sample_size):
+def train(input_dir, sample_size, classifier_name):
 	"""
 	Trains either a linear support vector classifier with k-bins discretizer
 	pre-processing or gradient boosting classifier.
-	:param input_dir:
-	:param sample_size:
+	:param input_dir: folder where the group folders area
+	:param sample_size: sample to be taken from each group
+	:param features: list of features to include
+	:param classifier_name: name of the classifier
 	https://scikit-learn.org/stable/auto_examples/preprocessing/plot_discretization_classification.html
 	"""
 	print('Beginning training\n')
@@ -36,21 +38,24 @@ def train(input_dir, sample_size):
 
 	x_train, x_test, y_train, y_test = __split(x, y)
 
-	# Uncomment these to train the LinearSVC with K-Bins Discretizer pre-processing
-	# x_train_est, x_test_est = __kbins(x_train, x_test, y_train, y_test)
-	# lsvc = __linearsvc(x_train_est, y_train)
+	if 'lsvc' in classifier_name:
+		x_train_est, x_test_est = __kbins(x_train, x_test, y_train, y_test)
+		lsvc = __linearsvc(x_train_est, y_train)
 
-	gbc = __gbc(x_train, y_train)
+		t0 = time()
+		y_pred = lsvc.predict(x_test_est)
+		print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
+		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
+		dump(lsvc, 'D:/University/FYP/project/source/classifiers/{}.joblib'.format(classifier_name))
+	elif 'gbc' in classifier_name:
+		gbc = __gbc(x_train, y_train)
 
-	t0 = time()
-	# Uncomment this to predict using the LinearSVC
-	# y_pred = lsvc.predict(x_test_est)
-	y_pred = gbc.predict(x_test)
-	print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
-	print('Training classification prediction report: \n', classification_report(y_test, y_pred))
+		t0 = time()
+		y_pred = gbc.predict(x_test)
+		print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
+		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
 
-	# dump(lsvc, 'D:/University/FYP/project/source/classifiers/lsvc-c04.joblib')
-	dump(gbc, 'D:/University/FYP/project/source/classifiers/test.joblib')
+		dump(gbc, 'D:/University/FYP/project/source/classifiers/{}.joblib'.format(classifier_name))
 
 
 def __linearsvc(x, y):
@@ -120,6 +125,7 @@ def __create_x(directory, sample_size):
 	Creates the features to be used for training
 	:param directory: where the IPCL group folders should be
 	:param sample_size: the sample size to be taken from each group
+	:param features: list of features to include
 	:return: a pandas DataFrame of 3 * sample_size
 	"""
 	group1 = __group(directory + 'group1/')
@@ -149,6 +155,7 @@ def __group(group_folder):
 	Groups together the data from the csv feature files in one group folder.
 	Loads them in chunksizes for speed.
 	:param group_folder: where the csv feature files should be
+	:param features: list of features to include
 	:return: a pandas DataFrame of the grouped data
 	"""
 	chunksize = 10 ** 6
@@ -195,4 +202,5 @@ def __group(group_folder):
 if __name__ == '__main__':
 	input_dir = 'D:/University/FYP/project/data_output/'
 	sample_size = 100000
-	train(input_dir, sample_size)
+	classifier_name = 'gbc-test'
+	train(input_dir, sample_size, classifier_name)
