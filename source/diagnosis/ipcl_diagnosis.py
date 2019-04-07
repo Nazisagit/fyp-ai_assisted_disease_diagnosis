@@ -11,7 +11,6 @@ or gradient boosting classifier.
 
 
 import pandas as pd
-import sys
 
 from source.diagnosis.ipcl_diagnoser import diagnose
 from source.diagnosis.Diagnoser import Diagnoser
