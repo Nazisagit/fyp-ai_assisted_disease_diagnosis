@@ -20,44 +20,6 @@ from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.svm import LinearSVC
 
 
-def train(input_dir, sample_size, dump_dir, classifier_name):
-	"""
-	Trains either a linear support vector classifier with k-bins discretizer
-	pre-processing or gradient boosting classifier.
-	:param input_dir: folder where the group folders area
-	:param sample_size: sample to be taken from each group
-	:param dump_dir: folder to dump the classifier
-	:param classifier_name: name of the classifier
-	https://scikit-learn.org/stable/auto_examples/preprocessing/plot_discretization_classification.html
-	"""
-	print('Beginning training\n')
-	print('Creating samples\n')
-	x = __create_x(input_dir, sample_size)
-	y = __create_y(sample_size)
-	print('Created samples\n')
-
-	x_train, x_test, y_train, y_test = __split(x, y)
-
-	if 'lsvc' in classifier_name:
-		x_train_est, x_test_est = __kbins(x_train, x_test, y_train, y_test)
-		lsvc = __linearsvc(x_train_est, y_train)
-
-		t0 = time()
-		y_pred = lsvc.predict(x_test_est)
-		print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
-		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
-		dump(lsvc, '{}/{}.joblib'.format(dump_dir, classifier_name))
-	elif 'gbc' in classifier_name:
-		gbc = __gbc(x_train, y_train)
-
-		t0 = time()
-		y_pred = gbc.predict(x_test)
-		print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
-		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
-
-		dump(gbc, '{}/{}.joblib'.format(dump_dir, classifier_name))
-
-
 def __linearsvc(x, y):
 	"""
 	Fits the linear support vector classifier to the data
@@ -81,6 +43,7 @@ def __kbins(x_train, x_test, y_train, y_test):
 	:param y_train: classes for training classifier
 	:param y_test: classes for testing classifier
 	:return: fitted x_train and x_test
+	https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.KBinsDiscretizer.html
 	"""
 	print('K-bins discretization pre-processing beginning.\n')
 	t0 = time()
@@ -101,7 +64,6 @@ def __gbc(x, y):
 	"""
 	print('GradientBoostingClassifier fitting beginning.\n')
 	t0 = time()
-
 	gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.9, max_depth=20, random_state=0)
 	gbc.fit(x, y)
 	print('Fitting GradientBoostingClassifier done in %0.3fs.\n' % (time() - t0))
@@ -114,6 +76,7 @@ def __split(x, y):
 	:param x: features
 	:param y: classes
 	:return: x_train, x_test, y_train, y_test
+	https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html
 	"""
 	x_train, x_test, y_train, y_test = train_test_split(
 		x, y, random_state=40, test_size=0.25)
@@ -195,6 +158,44 @@ def __group(group_folder):
 	# group = group.join(length)
 
 	return group
+
+
+def train(input_dir, sample_size, dump_dir, classifier_name):
+	"""
+	Trains either a linear support vector classifier with k-bins discretizer
+	pre-processing or gradient boosting classifier.
+	:param input_dir: folder where the group folders area
+	:param sample_size: sample to be taken from each group
+	:param dump_dir: folder to dump the classifier
+	:param classifier_name: name of the classifier
+	https://scikit-learn.org/stable/auto_examples/preprocessing/plot_discretization_classification.html
+	"""
+	print('Beginning training\n')
+	print('Creating samples\n')
+	x = __create_x(input_dir, sample_size)
+	y = __create_y(sample_size)
+	print('Created samples\n')
+
+	x_train, x_test, y_train, y_test = __split(x, y)
+
+	if 'lsvc' in classifier_name:
+		x_train_est, x_test_est = __kbins(x_train, x_test, y_train, y_test)
+		lsvc = __linearsvc(x_train_est, y_train)
+
+		t0 = time()
+		y_pred = lsvc.predict(x_test_est)
+		print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
+		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
+		dump(lsvc, '{}/{}.joblib'.format(dump_dir, classifier_name))
+	elif 'gbc' in classifier_name:
+		gbc = __gbc(x_train, y_train)
+
+		t0 = time()
+		y_pred = gbc.predict(x_test)
+		print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
+		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
+
+		dump(gbc, '{}/{}.joblib'.format(dump_dir, classifier_name))
 
 
 if __name__ == '__main__':
