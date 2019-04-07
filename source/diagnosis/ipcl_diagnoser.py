@@ -21,7 +21,7 @@ def diagnose(features_df, classifier):
 	:param features_df: pandas DataFrame of features used
 			to predict the IPCL group
 	"""
-	print('DISCLAIMER: This software is experimental. \n'
+	print('\n\nDISCLAIMER: This software is experimental. \n'
 	      'Please consult a qualified physician to obtain a diagnosis. \n')
 	clf = load(classifier)
 	t0 = time()
@@ -65,9 +65,12 @@ def __calculate_least_likely(prediction):
 	:param prediction: array of predictions
 	https://stackoverflow.com/questions/31571520/how-can-i-find-the-second-most-common-number-in-an-array
 	"""
-	a = np.array(prediction)
-	ctr = Counter(a.ravel())
-	least_common_value, frequency = ctr.most_common(3)[2]
-	percentage = (frequency / len(prediction)) * 100
-	print('Least likely: Group ', least_common_value, ' at %0.3fs' % percentage, '%.', frequency, '/', len(prediction), '\n')
+	try:
+		a = np.array(prediction)
+		ctr = Counter(a.ravel())
+		least_common_value, frequency = ctr.most_common(3)[2]
+		percentage = (frequency / len(prediction)) * 100
+		print('Least likely: Group ', least_common_value, ' at %0.3fs' % percentage, '%.', frequency, '/', len(prediction), '\n')
+	except IndexError:
+		print('There was an IndexError thrown, meaning the features were only classified into 2 classes.')
 

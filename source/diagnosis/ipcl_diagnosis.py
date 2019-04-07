@@ -97,8 +97,10 @@ def diagnosis(images, patient_number, patient_date, classifier):
 
 
 if __name__ == "__main__":
-	input_dir = '../../images/'
+	# Provide the full path to the images folder
+	input_dir = 'D:/University/FYP/project/images/'
 	patient_number = '0017021777d'
 	patient_date = '2017-03-07'
-	classifier = '../classifier/lsvc-c04.joblib'
+	# Provide the full path to the classifier
+	classifier = 'D:/University/FYP/project/source/classifiers/lsvc-c04.joblib'
 	diagnosis(input_dir, patient_number, patient_date, classifier)
