@@ -105,4 +105,5 @@ if __name__ == "__main__":
 	patient_date = '2017-03-07'
 	# Provide the full path to the classifier
 	classifier = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/source/classifiers/lsvc-c04.joblib'
+	# If you provide classifier as None, Dmitry's naive Bayes classifier will be used
 	diagnosis(images, patient_number, patient_date, classifier)

@@ -1,4 +1,5 @@
 # fyp-ai_assisted_disease_diagnosis
+## Use this readme in conjunction with the User Guide to take full advantage of the software
 ## Installation
 - Install Python 3.6 https://www.python.org/downloads/
 - Install the SciPy stack (NumPy, Pandas, Matplotlib) https://www.scipy.org/install.html

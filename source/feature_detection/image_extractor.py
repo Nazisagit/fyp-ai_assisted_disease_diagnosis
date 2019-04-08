@@ -19,21 +19,6 @@ from os.path import isfile, join
 import numpy as np
 
 
-def extract(images_path, output_folder):
-	files = [f for f in listdir(images_path) if isfile(join(images_path, f))]
-	counter = 0
-
-	for file in files:
-		if file.endswith('.png') or file.endswith('.jpg'):
-			image = cv2.imread(images_path + str(file))
-			__show_progressbar(counter, len(files))
-			counter += 1
-			if __get_darkness_percent(image) < 0.3:
-				cropped_image = __crop_frame(image)
-				final_output = output_folder + '_cropped_' + str(file)
-				cv2.imwrite(final_output, cropped_image)
-
-
 def __crop_frame(frame):
 	lower_black = np.array([0, 0, 16])
 	upper_black = np.array([165, 120, 23])
@@ -108,3 +93,18 @@ def __show_progressbar(iteration, total, fill='█'):
 	# Print New Line on Complete
 	if iteration == total:
 		print('\n')
+
+
+def extract(images_path, output_folder):
+	files = [f for f in listdir(images_path) if isfile(join(images_path, f))]
+	counter = 0
+
+	for file in files:
+		if file.endswith('.png') or file.endswith('.jpg'):
+			image = cv2.imread(images_path + str(file))
+			__show_progressbar(counter, len(files))
+			counter += 1
+			if __get_darkness_percent(image) < 0.3:
+				cropped_image = __crop_frame(image)
+				final_output = output_folder + '_cropped_' + str(file)
+				cv2.imwrite(final_output, cropped_image)

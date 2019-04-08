@@ -160,7 +160,6 @@ class Diagnoser:
     # Naive Bayes Classifier code starts here...
     # Determines diagnose based on the Naive Bayes compound probability.
     def naive_bayes(self):
-        # Define statistically determined healthy and unhealthy values
         # Modified
         # features used in the diagnosis are
         # Width, Height, Area, Colour

@@ -15,23 +15,6 @@ from time import time
 from joblib import load
 
 
-def diagnose(features_df, classifier):
-	"""
-	Loads a classifier to diagnose the features DataFrame
-	:param features_df: pandas DataFrame of features used
-			to predict the IPCL group
-	"""
-	print('\n\nDISCLAIMER: This software is experimental. \n'
-	      'Please consult a qualified physician to obtain a diagnosis. \n')
-	clf = load(classifier)
-	t0 = time()
-	prediction = clf.predict(features_df)
-	__calculate_most_likely(prediction)
-	__calculate_second_likely(prediction)
-	__calculate_least_likely(prediction)
-	print('Prediction completed in %0.3fs.\n' % (time() - t0))
-
-
 def __calculate_most_likely(prediction):
 	"""
 	Calculates and prints the percentage of the class with the highest
@@ -73,4 +56,21 @@ def __calculate_least_likely(prediction):
 		print('Least likely: Group ', least_common_value, ' at %0.3fs' % percentage, '%.', frequency, '/', len(prediction), '\n')
 	except IndexError:
 		print('\nEXCEPTION: There was an IndexError thrown, meaning the features were only classified into 2 classes.')
+
+
+def diagnose(features_df, classifier):
+	"""
+	Loads a classifier to diagnose the features DataFrame
+	:param features_df: pandas DataFrame of features used
+			to predict the IPCL group
+	"""
+	print('\n\nDISCLAIMER: This software is experimental. \n'
+	      'Please consult a qualified physician to obtain a diagnosis. \n')
+	clf = load(classifier)
+	t0 = time()
+	prediction = clf.predict(features_df)
+	__calculate_most_likely(prediction)
+	__calculate_second_likely(prediction)
+	__calculate_least_likely(prediction)
+	print('Prediction completed in %0.3fs.\n' % (time() - t0))
 
