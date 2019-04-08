@@ -2,8 +2,10 @@
 ## Use this readme in conjunction with the User Guide to take full advantage of the software
 ## Installation
 - Install Python 3.6 https://www.python.org/downloads/
-- Install the SciPy stack (NumPy, Pandas, Matplotlib) https://www.scipy.org/install.html
+- Install SciPy stack https://scipy.org/install.html
 - Install Scikit learn https://scikit-learn.org/stable/install.html
+- Install Joblib https://joblib.readthedocs.io/en/latest/installing.html
+- Install OpenCV-Python https://pypi.org/project/opencv-python/
 
 ## To run data_collector:
 - Change the variables at the bottom of the file according to your needs
