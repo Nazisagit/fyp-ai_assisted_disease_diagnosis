@@ -144,12 +144,15 @@ def collect(images, patient_number, patient_date, data_output, group):
 
 
 if __name__ == '__main__':
-	# Provide the full path to the images folder
-	images = 'D:/University/FYP/project/images/'
+	# Provide the full path to folder of images
+	images = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/images/'
+	# Provide the patient ID
 	patient_number = '0096043466d'
+	# Provide the date of the images
 	patient_date = '2018-07-06'
-	# Provide the full path to the data_output folder
-	data_output = 'D:/University/FYP/project/data_output/'
+	# Provide the full path to the data output folder
+	data_output = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/data_output/'
+	# Choose your group
 	group1 = 'group1/'
 	group2 = 'group2/'
 	group3 = 'group3/'

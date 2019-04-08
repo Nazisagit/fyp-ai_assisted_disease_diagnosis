@@ -199,8 +199,14 @@ def train(input_dir, sample_size, dump_dir, classifier_name):
 
 
 if __name__ == '__main__':
-	input_dir = 'D:/University/FYP/project/data_output/'
+	# Provide the full path to where the data shout be outputted
+	input_dir = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/data_output/'
+	# How much to sample from each group
 	sample_size = 100000
-	dump_dir = 'D:/University/FYP/project/source/classifiers'
+	# Provide the full path to where to save the classifier
+	dump_dir = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/source/classifiers'
+	# Name of classifier must contain either 'lsvc' or 'gbc'
+	# depending on if you would like to train a LinearSVC or
+	# GradientBoostinClassifier
 	classifier_name = 'gbc-test'
 	train(input_dir, sample_size, dump_dir, classifier_name)

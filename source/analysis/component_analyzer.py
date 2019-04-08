@@ -125,11 +125,9 @@ def check_importance(directory):
 
 
 if __name__ == "__main__":
-	# Prints out the amounts of a specific feature that has been collected
-	# Provide complete path
-	__group_lengths('D:/University/FYP/project/data_output/group1/')
-	__group_lengths('D:/University/FYP/project/data_output/group2/')
-	__group_lengths('D:/University/FYP/project/data_output/group3/')
-	# Checks the importance of the features to decide what features are most important
-	# Provide complete path
-	check_importance('D:/University/FYP/project/data_output/')
+	# Provide the full path to the specific group folder
+	__group_lengths('D:/University/FYP/fyp-ai_assisted_disease_diagnosis/data_output/group1/')
+	__group_lengths('D:/University/FYP/fyp-ai_assisted_disease_diagnosis/data_output/group2/')
+	__group_lengths('D:/University/FYP/fyp-ai_assisted_disease_diagnosis/data_output/group3/')
+	# Provide the full path to the data output
+	check_importance('D:/University/FYP/fyp-ai_assisted_disease_diagnosis/data_output/')

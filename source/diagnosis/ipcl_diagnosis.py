@@ -97,10 +97,12 @@ def diagnosis(images, patient_number, patient_date, classifier):
 
 
 if __name__ == "__main__":
-	# Provide the full path to the images folder
-	images = 'D:/University/FYP/project/images/'
+	# Provide the full path to folder of images
+	images = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/images/'
+	# Provide the patient ID
 	patient_number = '0017021777d'
+	# Provide the date of the images
 	patient_date = '2017-03-07'
 	# Provide the full path to the classifier
-	classifier = 'D:/University/FYP/project/source/classifiers/lsvc-c04.joblib'
+	classifier = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/source/classifiers/lsvc-c04.joblib'
 	diagnosis(images, patient_number, patient_date, classifier)
