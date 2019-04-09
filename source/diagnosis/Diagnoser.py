@@ -165,26 +165,26 @@ class Diagnoser:
         # Width, Height, Area, Colour
         # Structure [Group 1, Group 2, Group 3]
         # Width
-        mean_width = [8.239755, 7.752341, 7.604807]
-        sd_width = [7.272695, 6.07759, 6.523073]
+        mean_width = [8.239755, 7.752341, 9.100284]
+        sd_width = [7.272695, 6.07759, 8.679684]
         # Height
-        mean_height = [8.181128, 7.811186, 7.574423]
-        sd_height = [7.088363, 5.9439, 6.465264]
+        mean_height = [8.181128, 7.811186, 8.392283]
+        sd_height = [7.088363, 5.9439, 8.656635]
         # Area
-        mean_area = [23.681036, 20.505368, 22.695575]
-        sd_area = [25.966122, 21.795541, 26.583639]
+        mean_area = [23.681036, 20.505368, 29.100086]
+        sd_area = [25.966122, 21.795541, 59.67887]
         # Red colour
-        mean_red = [98.276078, 109.314981, 102.045455]
-        sd_red = [34.581402, 24.362770, 25.589054]
+        mean_red = [98.276078, 109.314981, 117.257958]
+        sd_red = [34.581402, 24.362770, 24.477308]
         # Green colour
-        mean_green = [74.935504, 83.073079, 77.477525]
-        sd_green = [24.786052, 22.269277, 23.932506]
+        mean_green = [74.935504, 83.073079, 70.706435]
+        sd_green = [24.786052, 22.269277, 21.105437]
         # Blue colour
-        mean_blue = [95.374316, 105.005287, 98.653857]
-        sd_blue = [28.716705, 24.780164, 26.931724]
+        mean_blue = [95.374316, 105.005287, 91.016510]
+        sd_blue = [28.716705, 24.780164, 24.196743]
         # Length
-        mean_length = [19.378218, 18.711602, 17.63317]
-        sd_length = [17.262154, 15.360977, 16.3681]
+        mean_length = [19.378218, 18.711602, 20.679101]
+        sd_length = [17.262154, 15.360977, 27.685091]
 
 
         # Perform statistical analysis of the current state of the feature table
@@ -202,7 +202,7 @@ class Diagnoser:
         diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Colour'][0], mean_red[0], sd_red[0])
         diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Colour'][1], mean_green[0], sd_green[0])
         diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Colour'][2], mean_blue[0], sd_blue[0])
-        # diagnoses['Group 1'] *= self.calculateProbability(self.statistics['Mean Length'], mean_length[0], sd_length[0])
+        diagnoses['Group 1'] *= self.calculate_probability(self.statistics['Mean Length'], mean_length[0], sd_length[0])
 
         diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Width'], mean_width[1], sd_width[1])
         diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Height'], mean_height[1], sd_height[1])
@@ -210,7 +210,7 @@ class Diagnoser:
         diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Colour'][0], mean_red[1], sd_red[1])
         diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Colour'][1], mean_green[1], sd_green[1])
         diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Colour'][2], mean_blue[1], sd_blue[1])
-        # diagnoses['Group 2'] *= self.calculateProbability(self.statistics['Mean Length'], mean_length[1], sd_length[1])
+        diagnoses['Group 2'] *= self.calculate_probability(self.statistics['Mean Length'], mean_length[1], sd_length[1])
 
         diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Width'], mean_width[2], sd_width[2])
         diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Height'], mean_height[2], sd_height[2])
@@ -218,7 +218,7 @@ class Diagnoser:
         diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Colour'][0], mean_red[2], sd_red[2])
         diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Colour'][1], mean_green[2], sd_green[2])
         diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Colour'][2], mean_blue[2], sd_blue[2])
-        # diagnoses['Group 3'] *= self.calculateProbability(self.statistics['Mean Length'], mean_length[2], sd_length[2])
+        diagnoses['Group 3'] *= self.calculate_probability(self.statistics['Mean Length'], mean_length[2], sd_length[2])
 
         # Normalisation constant to identify class probability
         normalisation_constant = diagnoses['Group 1'] + diagnoses['Group 2'] + diagnoses['Group 3']

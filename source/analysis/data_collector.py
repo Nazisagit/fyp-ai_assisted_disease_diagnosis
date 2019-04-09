@@ -147,9 +147,9 @@ if __name__ == '__main__':
 	# Provide the full path to folder of images
 	images = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/images/'
 	# Provide the patient ID
-	patient_number = '0096043466d'
+	patient_number = '0017157764d'
 	# Provide the date of the images
-	patient_date = '2018-07-06'
+	patient_date = '2018-04-28'
 	# Provide the full path to the data output folder
 	data_output = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/data_output/'
 	# Choose your group

@@ -1,7 +1,7 @@
 # Filename: trainer.py
 # Author: Nazrin Pengiran
 # Institution: King's College London
-# Last modified: 06/04/2019
+# Last modified: 08/04/2019
 
 """
 Creates a trained classifier: either a
@@ -29,7 +29,7 @@ def __linearsvc(x, y):
 	https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html#sklearn.svm.LinearSVC
 	"""
 	t0 = time()
-	lsvc = LinearSVC(random_state=0, multi_class='ovr', max_iter=2500, penalty='l2')
+	lsvc = LinearSVC(random_state=0, multi_class='ovr', max_iter=2000, penalty='l2')
 	lsvc.fit(x, y)
 	print('Fitting LinearSVC done in %0.3fs' % (time() - t0), '\n')
 	return lsvc
@@ -64,7 +64,7 @@ def __gbc(x, y):
 	"""
 	print('GradientBoostingClassifier fitting beginning.\n')
 	t0 = time()
-	gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.9, max_depth=20, random_state=0)
+	gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.8, max_depth=50, random_state=0)
 	gbc.fit(x, y)
 	print('Fitting GradientBoostingClassifier done in %0.3fs.\n' % (time() - t0))
 	return gbc
@@ -78,8 +78,7 @@ def __split(x, y):
 	:return: x_train, x_test, y_train, y_test
 	https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html
 	"""
-	x_train, x_test, y_train, y_test = train_test_split(
-		x, y, random_state=40, test_size=0.25)
+	x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=30, test_size=0.25)
 	return x_train, x_test, y_train, y_test
 
 
@@ -155,7 +154,7 @@ def __group(group_folder):
 	group = width.join(height)
 	group = group.join(area)
 	group = group.join(colour)
-	# group = group.join(length)
+	group = group.join(length)
 
 	return group
 
@@ -194,19 +193,20 @@ def train(input_dir, sample_size, dump_dir, classifier_name):
 		y_pred = gbc.predict(x_test)
 		print('Training classification prediction done in %0.3fs.\n' % (time() - t0))
 		print('Training classification prediction report: \n', classification_report(y_test, y_pred))
-
 		dump(gbc, '{}/{}.joblib'.format(dump_dir, classifier_name))
+	else:
+		print('Please check the classifier name.')
 
 
 if __name__ == '__main__':
 	# Provide the full path to where the data shout be outputted
 	input_dir = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/data_output/'
 	# How much to sample from each group
-	sample_size = 100000
+	sample_size = 60000
 	# Provide the full path to where to save the classifier
 	dump_dir = 'D:/University/FYP/fyp-ai_assisted_disease_diagnosis/source/classifiers'
 	# Name of classifier must contain either 'lsvc' or 'gbc'
 	# depending on if you would like to train a LinearSVC or
 	# GradientBoostinClassifier
-	classifier_name = 'gbc-test'
+	classifier_name = 'gbc-c26'
 	train(input_dir, sample_size, dump_dir, classifier_name)
